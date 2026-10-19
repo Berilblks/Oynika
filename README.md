@@ -2,7 +2,7 @@
 
 Arkadaş ortamlarında oynanan beş parti oyununu bir araya getiren, Türkçe ve çevrimdışı Flutter uygulaması. Backend, üyelik ve giriş sistemi yoktur.
 
-Faz 1 altyapısı tamamlandı. **Faz 2** onaylanan ana ekran tasarımını, oyun tanıtımlarını, alt navigasyonu ve tema seçimini içerir. Oyun mekanikleri ve soru/kelime havuzları henüz yoktur.
+Faz 1 altyapısı tamamlandı. **Faz 2** onaylanan ana ekran tasarımını, oyun tanıtımlarını, alt navigasyonu ve tema seçimini içerir. **Faz 3** ile Tabu oynanabilir durumdadır; 250 çevrimdışı Türkçe kart içerir. Diğer dört oyun tanıtım aşamasındadır.
 
 ## Teknolojiler
 
@@ -58,14 +58,14 @@ android/
 ios/
 ```
 
-Beş oyunun açıklamaları, renkleri, asset yolları ve temel oynanış açıklamaları PartyGame içinde tutulur. Tanıtımlar ortak GameIntroScreen şablonuyla üretilir; kullanılmayan boş oyun ekranları yoktur.
+Beş oyunun açıklamaları, renkleri, asset yolları ve temel oynanış açıklamaları PartyGame içinde tutulur. Tabu kendi modülünü kullanır; diğer tanıtımlar ortak GameIntroScreen şablonuyla üretilir; kullanılmayan boş oyun ekranları yoktur.
 
 ## Ekranlar ve rotalar
 
-- `/`: Oynika logosu, slogan, organik mor karşılama alanı ve oyun kartları. Beyaz ok, oyunlar bölümüne animasyonla kaydırır. Üst ayarlar butonu Ayarlar sekmesini açar.
+- `/`: Oynika logosu, slogan, organik mor karşılama alanı ve oyun kartları. Beyaz ok, oyunlar bölümüne animasyonla kaydırır. Ayarlar alt navigasyondan açılır.
 - `/games`: Aynı oyun kartlarını kullanan oyun listesi.
 - `/settings`: Sistem/Açık/Koyu tema, hakkında, sürüm ve açık kaynak lisansları.
-- `/games/taboo`
+- `/games/taboo`: Tabu kurulumu ve beş evreli gerçek oyun akışı.
 - `/games/charades`
 - `/games/who_am_i`
 - `/games/five_seconds`
@@ -133,7 +133,7 @@ Faz 1'in açılış, başlık, beş oyun ve küçük ekran kontrolleri korunup y
 
 - Ana ekranın hatasız açılması, slogan ve beş oyunun erişilebilir olması
 - Her kartın doğru oyun tanıtımını açması ve geri dönüş
-- Üç alt sekme, Oyunlar ekranından tanıtım, üst Ayarlar butonu
+- Üç alt sekme, Oyunlar ekranından tanıtım, alt Ayarlar ikonu
 - Sistem/Açık/Koyu seçimi ve sekmeler arasında temanın korunması
 - Karşılama okunun oyunlara kaydırması
 - Geçersiz oyun rotasının yönlendirilmesi
@@ -144,7 +144,7 @@ Faz 2 doğrulaması (18 Ekim 2026): pub get başarılı, analyze temiz, 15 test 
 
 ## Bilinen sınırlar
 
-- Oyunlar henüz oynanamaz; tüm tanıtımlarda geliştirme bilgisi vardır.
+- Tabu oynanabilir; diğer dört oyun geliştirme aşamasındadır.
 - Tema seçimi yalnızca oturum boyunca korunur.
 - Üretilen illüstrasyonlar referansın yeniden yorumudur; birebir aynı çizimler değildir.
 - iOS derleme/cihaz testi yapılmadı.
@@ -154,3 +154,13 @@ Faz 2 doğrulaması (18 Ekim 2026): pub get başarılı, analyze temiz, 15 test 
 Resmî kaynak logo assets/branding/oynika_logo.png konumundadır. Android launcher/adaptive/monochrome ikonları, iOS AppIcon kataloğu ve native splash görselleri bu kaynaktan üretildi; yeni paket eklenmedi. Ana ekrandaki başlık ve slogan korunarak resmî logo eklendi.
 
 Üretim betiği, boyutlar, kaynak hash'i ve platform sınırlamaları: [Marka entegrasyonu](assets/branding/README.md).
+
+## Faz 3 — oynanabilir Tabu
+
+Kurallar, mimari, 250 kartın kategori/zorluk dağılımı, araştırma kaynakları, testler ve emülatör doğrulaması: [Faz 3 teknik notları](docs/tabu_phase3.md).
+
+Modül: lib/features/games/tabu/ (domain, data, application, presentation). Kart asset'i: assets/data/tabu_cards.json. Yeni testler: test/tabu_controller_test.dart ve test/tabu_widget_test.dart. Toplam 64 test; oyun oturumu yalnızca bellekte tutulur.
+
+Tabu güncel kuralı: tur sınırı yoktur; 10/15/20/25/30 hedef puanından seçilene ilk ulaşan takım kazanır. Varsayılan hedef 20'dir. Kart havuzu tükenince yeniden karıştırılır ve oyun sürer.
+
+Her Tabu turunda en fazla 3 pas kullanılabilir. Oynanışta küçük süre kapsülü ve aktif takımın puan/hedefi gösterilir. Tur Sonu ekranında iki pastel toplam skor kartı ve yalnızca Sonraki Takım butonu bulunur.

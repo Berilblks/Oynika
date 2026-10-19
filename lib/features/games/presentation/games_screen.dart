@@ -26,9 +26,7 @@ class GamesScreen extends StatelessWidget {
               SizedBox(height: 20),
               GameCollection(),
               SizedBox(height: 20),
-              Text(
-                'Oyunlar geliştirme aşamasında. Şimdilik nasıl oynandıklarını keşfedebilirsin.',
-              ),
+              Text('Tabu oynamaya hazır! Diğer oyunlar geliştirme aşamasında.'),
               SizedBox(height: 12),
             ],
           ),

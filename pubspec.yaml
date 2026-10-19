@@ -22,6 +22,7 @@ flutter:
   assets:
     - assets/branding/oynika_logo.png
     - assets/branding/oynika_logo_borderless.png
+    - assets/data/tabu_cards.json
     - assets/illustrations/
     - assets/fonts/OFL.txt
   fonts:

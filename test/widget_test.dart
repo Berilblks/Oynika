@@ -1,3 +1,4 @@
+import 'package:oynika/features/games/tabu/data/card_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,6 +21,7 @@ void main() {
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
     final container = ProviderContainer();
     addTearDown(container.dispose);
+    await tester.runAsync(() => container.read(tabuCardsProvider.future));
     await tester.pumpWidget(
       UncontrolledProviderScope(container: container, child: const OynikaApp()),
     );
@@ -68,7 +70,7 @@ void main() {
     }
     await tester.ensureVisible(
       find.text(
-        'Oyunlar geliştirme aşamasında. Şimdilik oyunları keşfedebilirsin.',
+        'Tabu oynamaya hazır! Diğer oyunları şimdilik keşfedebilirsin.',
       ),
     );
     expect(tester.takeException(), isNull);
@@ -82,10 +84,18 @@ void main() {
       await tapVisible(tester, find.byKey(ValueKey('game-card-${game.asset}')));
       expect(container.read(appRouterProvider).state.uri.path, game.path);
       expect(find.text(game.title), findsOneWidget);
-      expect(find.text('Nasıl oynanır?'), findsOneWidget);
-      await tester.ensureVisible(find.text('Geliştirme aşamasında'));
-      await tester.pumpAndSettle();
-      expect(find.text('Geliştirme aşamasında').hitTestable(), findsOneWidget);
+      if (game == PartyGame.taboo) {
+        expect(find.text('Takım İsimleri'), findsOneWidget);
+        expect(find.text('Geliştirme aşamasında'), findsNothing);
+      } else {
+        expect(find.text('Nasıl oynanır?'), findsOneWidget);
+        await tester.ensureVisible(find.text('Geliştirme aşamasında'));
+        await tester.pumpAndSettle();
+        expect(
+          find.text('Geliştirme aşamasında').hitTestable(),
+          findsOneWidget,
+        );
+      }
       await tester.tap(find.byTooltip('Geri'));
       await tester.pumpAndSettle();
       expect(container.read(appRouterProvider).state.uri.path, '/');
@@ -105,7 +115,7 @@ void main() {
         expect(find.byKey(ValueKey('game-card-${game.asset}')), findsOneWidget);
       }
       await tapVisible(tester, find.byKey(const ValueKey('game-card-taboo')));
-      expect(find.text('Nasıl oynanır?'), findsOneWidget);
+      expect(find.text('Takım İsimleri'), findsOneWidget);
       await tester.tap(find.byTooltip('Geri'));
       await tester.pumpAndSettle();
       expect(container.read(appRouterProvider).state.uri.path, '/games');

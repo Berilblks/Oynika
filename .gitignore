@@ -42,3 +42,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local Phase 3 design screenshot; excluded from source commits.
+/design_reference/tabu_phase3.png

@@ -1,3 +1,4 @@
+import '../../features/games/tabu/presentation/tabu_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -55,9 +56,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     ? '/games'
                     : null,
         builder:
-            (context, state) => GameIntroScreen(
-              game: PartyGame.fromSlug(state.pathParameters['game'])!,
-            ),
+            (context, state) =>
+                (PartyGame.fromSlug(state.pathParameters['game']) ==
+                        PartyGame.taboo
+                    ? const TabuScreen()
+                    : GameIntroScreen(
+                      game: PartyGame.fromSlug(state.pathParameters['game'])!,
+                    )),
       ),
     ],
     errorBuilder:

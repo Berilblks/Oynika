@@ -123,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const GameCollection(),
                     const SizedBox(height: 20),
                     Text(
-                      'Oyunlar geliştirme aşamasında. Şimdilik oyunları keşfedebilirsin.',
+                      'Tabu oynamaya hazır! Diğer oyunları şimdilik keşfedebilirsin.',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

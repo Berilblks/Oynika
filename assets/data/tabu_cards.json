@@ -1,0 +1,3252 @@
+[
+  {
+    "id": "tabu-001",
+    "word": "Kahvaltı",
+    "forbidden": [
+      "Sabah",
+      "Çay",
+      "Peynir",
+      "Zeytin",
+      "Sofra"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-002",
+    "word": "Alışveriş",
+    "forbidden": [
+      "Mağaza",
+      "Para",
+      "Sepet",
+      "Kasa",
+      "Ürün"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-003",
+    "word": "Temizlik",
+    "forbidden": [
+      "Süpürge",
+      "Toz",
+      "Silmek",
+      "Deterjan",
+      "Bez"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-004",
+    "word": "Uyku",
+    "forbidden": [
+      "Yatak",
+      "Gece",
+      "Rüya",
+      "Yastık",
+      "Dinlenmek"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-005",
+    "word": "Komşu",
+    "forbidden": [
+      "Apartman",
+      "Yan",
+      "Daire",
+      "Ziyaret",
+      "Kapı"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-006",
+    "word": "Misafir",
+    "forbidden": [
+      "Ev",
+      "Ağırlamak",
+      "İkram",
+      "Ziyaret",
+      "Konuk"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-007",
+    "word": "Randevu",
+    "forbidden": [
+      "Saat",
+      "Buluşma",
+      "Tarih",
+      "Beklemek",
+      "Plan"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-008",
+    "word": "Piknik",
+    "forbidden": [
+      "Örtü",
+      "Sepet",
+      "Çimen",
+      "Yemek",
+      "Doğa"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-009",
+    "word": "Taşınmak",
+    "forbidden": [
+      "Koli",
+      "Ev",
+      "Nakliye",
+      "Eşya",
+      "Adres"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-010",
+    "word": "Çamaşır",
+    "forbidden": [
+      "Makine",
+      "Deterjan",
+      "Kirli",
+      "Yıkamak",
+      "Asmak"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-011",
+    "word": "Bulaşık",
+    "forbidden": [
+      "Tabak",
+      "Lavabo",
+      "Sünger",
+      "Yıkamak",
+      "Mutfak"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-012",
+    "word": "Ütü",
+    "forbidden": [
+      "Kırışık",
+      "Gömlek",
+      "Sıcak",
+      "Buhar",
+      "Düzeltmek"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-013",
+    "word": "Kuyruk",
+    "forbidden": [
+      "Sıra",
+      "Beklemek",
+      "Ön",
+      "Arka",
+      "Kalabalık"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-014",
+    "word": "Trafik",
+    "forbidden": [
+      "Araba",
+      "Yol",
+      "Işık",
+      "Sıkışmak",
+      "Korna"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-015",
+    "word": "Fatura",
+    "forbidden": [
+      "Ödeme",
+      "Elektrik",
+      "Borç",
+      "Tutar",
+      "Abone"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-016",
+    "word": "Tasarruf",
+    "forbidden": [
+      "Birikim",
+      "Para",
+      "Harcamak",
+      "Kumbara",
+      "Ekonomi"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-017",
+    "word": "Hediye",
+    "forbidden": [
+      "Paket",
+      "Sürpriz",
+      "Doğum günü",
+      "Armağan",
+      "Kurdele"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-018",
+    "word": "Davet",
+    "forbidden": [
+      "Çağırmak",
+      "Katılmak",
+      "Etkinlik",
+      "Misafir",
+      "Kart"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-019",
+    "word": "Sohbet",
+    "forbidden": [
+      "Konuşmak",
+      "Arkadaş",
+      "Muhabbet",
+      "Dinlemek",
+      "Konu"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-020",
+    "word": "Yardımlaşma",
+    "forbidden": [
+      "Destek",
+      "Dayanışma",
+      "Paylaşmak",
+      "İhtiyaç",
+      "Birlik"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-021",
+    "word": "Ertelemek",
+    "forbidden": [
+      "Sonra",
+      "Yarın",
+      "Gecikmek",
+      "İş",
+      "Zaman"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-022",
+    "word": "Özür",
+    "forbidden": [
+      "Hata",
+      "Affetmek",
+      "Pişmanlık",
+      "Kusur",
+      "Bağışlamak"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-023",
+    "word": "Teşekkür",
+    "forbidden": [
+      "Sağ ol",
+      "Minnet",
+      "İyilik",
+      "Nezaket",
+      "Memnuniyet"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-024",
+    "word": "Sabır",
+    "forbidden": [
+      "Beklemek",
+      "Dayanmak",
+      "Sakin",
+      "Zaman",
+      "Tahammül"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-025",
+    "word": "Alışkanlık",
+    "forbidden": [
+      "Tekrar",
+      "Davranış",
+      "Rutin",
+      "Bırakmak",
+      "Günlük"
+    ],
+    "category": "Günlük yaşam",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-026",
+    "word": "Pizza",
+    "forbidden": [
+      "İtalya",
+      "Peynir",
+      "Hamur",
+      "Dilim",
+      "Fırın"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-027",
+    "word": "Mantı",
+    "forbidden": [
+      "Yoğurt",
+      "Hamur",
+      "Kıyma",
+      "Kayseri",
+      "Sarımsak"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-028",
+    "word": "Çorba",
+    "forbidden": [
+      "Kaşık",
+      "Kase",
+      "Sıcak",
+      "Mercimek",
+      "İçmek"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-029",
+    "word": "Simit",
+    "forbidden": [
+      "Susam",
+      "Halka",
+      "Fırın",
+      "Kahvaltı",
+      "Çay"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-030",
+    "word": "Dondurma",
+    "forbidden": [
+      "Soğuk",
+      "Külah",
+      "Yaz",
+      "Süt",
+      "Erimek"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-031",
+    "word": "Baklava",
+    "forbidden": [
+      "Şerbet",
+      "Fıstık",
+      "Hamur",
+      "Tatlı",
+      "Kat"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-032",
+    "word": "Dolma",
+    "forbidden": [
+      "Biber",
+      "İç",
+      "Pirinç",
+      "Doldurmak",
+      "Tencere"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-033",
+    "word": "Sarma",
+    "forbidden": [
+      "Yaprak",
+      "Pirinç",
+      "Sarmak",
+      "Zeytinyağı",
+      "Lahana"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-034",
+    "word": "Menemen",
+    "forbidden": [
+      "Yumurta",
+      "Domates",
+      "Biber",
+      "Tava",
+      "Kahvaltı"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-035",
+    "word": "Pilav",
+    "forbidden": [
+      "Pirinç",
+      "Tereyağı",
+      "Tane",
+      "Bulgur",
+      "Tencere"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-036",
+    "word": "Köfte",
+    "forbidden": [
+      "Kıyma",
+      "Izgara",
+      "Yuvarlak",
+      "Et",
+      "Baharat"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-037",
+    "word": "Börek",
+    "forbidden": [
+      "Yufka",
+      "Peynir",
+      "Tepsi",
+      "Fırın",
+      "Kat"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-038",
+    "word": "Künefe",
+    "forbidden": [
+      "Kadayıf",
+      "Peynir",
+      "Şerbet",
+      "Hatay",
+      "Sıcak"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-039",
+    "word": "Lokum",
+    "forbidden": [
+      "Şeker",
+      "Yumuşak",
+      "Gül",
+      "Kahve",
+      "Küp"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-040",
+    "word": "Ayran",
+    "forbidden": [
+      "Yoğurt",
+      "Su",
+      "Tuz",
+      "İçecek",
+      "Köpük"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-041",
+    "word": "Limonata",
+    "forbidden": [
+      "Limon",
+      "Ekşi",
+      "Sarı",
+      "Soğuk",
+      "Şeker"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-042",
+    "word": "Salep",
+    "forbidden": [
+      "Sıcak",
+      "Süt",
+      "Tarçın",
+      "Kış",
+      "İçecek"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-043",
+    "word": "Kahve",
+    "forbidden": [
+      "Fincan",
+      "Telve",
+      "Kafein",
+      "Çekirdek",
+      "Fal"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-044",
+    "word": "Çay",
+    "forbidden": [
+      "Bardak",
+      "Demlik",
+      "Demlemek",
+      "Şeker",
+      "Sıcak"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-045",
+    "word": "Nar",
+    "forbidden": [
+      "Kırmızı",
+      "Tane",
+      "Kabuk",
+      "Meyve",
+      "Ekşi"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-046",
+    "word": "Karpuz",
+    "forbidden": [
+      "Yaz",
+      "Çekirdek",
+      "Kabuk",
+      "Kırmızı",
+      "Dilim"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-047",
+    "word": "Patlamış mısır",
+    "forbidden": [
+      "Sinema",
+      "Tane",
+      "Tencere",
+      "Tuz",
+      "Atıştırmalık"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-048",
+    "word": "Reçel",
+    "forbidden": [
+      "Meyve",
+      "Kahvaltı",
+      "Kavanoz",
+      "Şeker",
+      "Tatlı"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-049",
+    "word": "Turşu",
+    "forbidden": [
+      "Salatalık",
+      "Sirke",
+      "Tuz",
+      "Kavanoz",
+      "Ekşi"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-050",
+    "word": "Lolipop",
+    "forbidden": [
+      "Şeker",
+      "Çubuk",
+      "Yalamak",
+      "Renkli",
+      "Yuvarlak"
+    ],
+    "category": "Yemek ve içecek",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-051",
+    "word": "Futbol",
+    "forbidden": [
+      "Top",
+      "Kale",
+      "Gol",
+      "Saha",
+      "Hakem"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-052",
+    "word": "Basketbol",
+    "forbidden": [
+      "Pota",
+      "Top",
+      "Parke",
+      "Sayı",
+      "Çember"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-053",
+    "word": "Voleybol",
+    "forbidden": [
+      "File",
+      "Smaç",
+      "Servis",
+      "Top",
+      "Manşet"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-054",
+    "word": "Tenis",
+    "forbidden": [
+      "Raket",
+      "Kort",
+      "Top",
+      "Set",
+      "Servis"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-055",
+    "word": "Yüzme",
+    "forbidden": [
+      "Havuz",
+      "Su",
+      "Kulaç",
+      "Mayo",
+      "Deniz"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-056",
+    "word": "Koşu",
+    "forbidden": [
+      "Ayak",
+      "Hız",
+      "Parkur",
+      "Nefes",
+      "Yarış"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-057",
+    "word": "Bisiklet",
+    "forbidden": [
+      "Pedal",
+      "Tekerlek",
+      "Gidon",
+      "Sele",
+      "Sürmek"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-058",
+    "word": "Boks",
+    "forbidden": [
+      "Eldiven",
+      "Ring",
+      "Yumruk",
+      "Raunt",
+      "Rakip"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-059",
+    "word": "Güreş",
+    "forbidden": [
+      "Minder",
+      "Pehlivan",
+      "Tuş",
+      "Rakip",
+      "Kispet"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-060",
+    "word": "Okçuluk",
+    "forbidden": [
+      "Yay",
+      "Ok",
+      "Hedef",
+      "Nişan",
+      "Atış"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-061",
+    "word": "Eskrim",
+    "forbidden": [
+      "Kılıç",
+      "Maske",
+      "Düello",
+      "Hamle",
+      "Rakip"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-062",
+    "word": "Kayak",
+    "forbidden": [
+      "Kar",
+      "Pist",
+      "Baton",
+      "Kış",
+      "Dağ"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-063",
+    "word": "Buz pateni",
+    "forbidden": [
+      "Pist",
+      "Kaymak",
+      "Bıçak",
+      "Dönüş",
+      "Soğuk"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-064",
+    "word": "Halter",
+    "forbidden": [
+      "Ağırlık",
+      "Kaldırmak",
+      "Demir",
+      "Sporcu",
+      "Bar"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-065",
+    "word": "Jimnastik",
+    "forbidden": [
+      "Esneklik",
+      "Denge",
+      "Takla",
+      "Minder",
+      "Halka"
+    ],
+    "category": "Spor",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-066",
+    "word": "Maraton",
+    "forbidden": [
+      "Mesafe",
+      "Koşmak",
+      "Dayanıklılık",
+      "Bitiş",
+      "Yarış"
+    ],
+    "category": "Spor",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-067",
+    "word": "Sörf",
+    "forbidden": [
+      "Dalga",
+      "Tahta",
+      "Deniz",
+      "Denge",
+      "Rüzgâr"
+    ],
+    "category": "Spor",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-068",
+    "word": "Dalış",
+    "forbidden": [
+      "Tüp",
+      "Su",
+      "Maske",
+      "Derin",
+      "Nefes"
+    ],
+    "category": "Spor",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-069",
+    "word": "Antrenör",
+    "forbidden": [
+      "Takım",
+      "Çalıştırmak",
+      "Taktik",
+      "Sporcu",
+      "Maç"
+    ],
+    "category": "Spor",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-070",
+    "word": "Hakem",
+    "forbidden": [
+      "Düdük",
+      "Karar",
+      "Kart",
+      "Kural",
+      "Maç"
+    ],
+    "category": "Spor",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-071",
+    "word": "Kaleci",
+    "forbidden": [
+      "Eldiven",
+      "Kale",
+      "Kurtarış",
+      "Gol",
+      "Top"
+    ],
+    "category": "Spor",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-072",
+    "word": "Şampiyon",
+    "forbidden": [
+      "Kupa",
+      "Birinci",
+      "Kazanmak",
+      "Madalya",
+      "Zafer"
+    ],
+    "category": "Spor",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-073",
+    "word": "Stadyum",
+    "forbidden": [
+      "Tribün",
+      "Saha",
+      "Taraftar",
+      "Maç",
+      "Koltuk"
+    ],
+    "category": "Spor",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-074",
+    "word": "Isınma",
+    "forbidden": [
+      "Kas",
+      "Hareket",
+      "Antrenman",
+      "Esneme",
+      "Hazırlık"
+    ],
+    "category": "Spor",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-075",
+    "word": "Tribün",
+    "forbidden": [
+      "Seyirci",
+      "Tezahürat",
+      "Koltuk",
+      "Taraftar",
+      "Stadyum"
+    ],
+    "category": "Spor",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-076",
+    "word": "Öğretmen",
+    "forbidden": [
+      "Okul",
+      "Ders",
+      "Öğrenci",
+      "Tahta",
+      "Sınıf"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-077",
+    "word": "Doktor",
+    "forbidden": [
+      "Hastane",
+      "Muayene",
+      "Hasta",
+      "Reçete",
+      "Tıp"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-078",
+    "word": "Hemşire",
+    "forbidden": [
+      "Hasta",
+      "İğne",
+      "Hastane",
+      "Bakım",
+      "Serum"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-079",
+    "word": "İtfaiyeci",
+    "forbidden": [
+      "Yangın",
+      "Hortum",
+      "Merdiven",
+      "Söndürmek",
+      "Kask"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-080",
+    "word": "Polis",
+    "forbidden": [
+      "Güvenlik",
+      "Suç",
+      "Üniforma",
+      "Karakol",
+      "Devriye"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-081",
+    "word": "Aşçı",
+    "forbidden": [
+      "Mutfak",
+      "Yemek",
+      "Tencere",
+      "Önlük",
+      "Restoran"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-082",
+    "word": "Fırıncı",
+    "forbidden": [
+      "Ekmek",
+      "Hamur",
+      "Un",
+      "Fırın",
+      "Kürek"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-083",
+    "word": "Terzi",
+    "forbidden": [
+      "Dikiş",
+      "İğne",
+      "Kumaş",
+      "Ölçü",
+      "Makine"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-084",
+    "word": "Berber",
+    "forbidden": [
+      "Saç",
+      "Makas",
+      "Tıraş",
+      "Sakal",
+      "Tarak"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-085",
+    "word": "Mimar",
+    "forbidden": [
+      "Bina",
+      "Çizim",
+      "Tasarım",
+      "Proje",
+      "Plan"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-086",
+    "word": "Mühendis",
+    "forbidden": [
+      "Hesap",
+      "Proje",
+      "Teknik",
+      "Tasarım",
+      "Üniversite"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-087",
+    "word": "Avukat",
+    "forbidden": [
+      "Mahkeme",
+      "Savunma",
+      "Dava",
+      "Hukuk",
+      "Müvekkil"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-088",
+    "word": "Hâkim",
+    "forbidden": [
+      "Karar",
+      "Mahkeme",
+      "Adalet",
+      "Duruşma",
+      "Cübbe"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-089",
+    "word": "Pilot",
+    "forbidden": [
+      "Uçak",
+      "Kokpit",
+      "Uçmak",
+      "Havaalanı",
+      "Kaptan"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-090",
+    "word": "Kaptan",
+    "forbidden": [
+      "Gemi",
+      "Deniz",
+      "Dümen",
+      "Liman",
+      "Mürettebat"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-091",
+    "word": "Çiftçi",
+    "forbidden": [
+      "Tarla",
+      "Traktör",
+      "Ürün",
+      "Toprak",
+      "Hasat"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-092",
+    "word": "Veteriner",
+    "forbidden": [
+      "Hayvan",
+      "Muayene",
+      "Klinik",
+      "Tedavi",
+      "Aşı"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-093",
+    "word": "Eczacı",
+    "forbidden": [
+      "İlaç",
+      "Reçete",
+      "Eczane",
+      "Doz",
+      "Sağlık"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-094",
+    "word": "Gazeteci",
+    "forbidden": [
+      "Haber",
+      "Röportaj",
+      "Gazete",
+      "Muhabir",
+      "Basın"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-095",
+    "word": "Fotoğrafçı",
+    "forbidden": [
+      "Kamera",
+      "Poz",
+      "Objektif",
+      "Çekim",
+      "Flaş"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-096",
+    "word": "Ressam",
+    "forbidden": [
+      "Boya",
+      "Tuval",
+      "Fırça",
+      "Resim",
+      "Palet"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-097",
+    "word": "Oyuncu",
+    "forbidden": [
+      "Rol",
+      "Sahne",
+      "Film",
+      "Karakter",
+      "Senaryo"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-098",
+    "word": "Müzisyen",
+    "forbidden": [
+      "Nota",
+      "Enstrüman",
+      "Konser",
+      "Melodi",
+      "Sahne"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-099",
+    "word": "Arkeolog",
+    "forbidden": [
+      "Kazı",
+      "Tarih",
+      "Kalıntı",
+      "Antik",
+      "Eser"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-100",
+    "word": "Astronot",
+    "forbidden": [
+      "Uzay",
+      "Roket",
+      "Kask",
+      "Yörünge",
+      "Ay"
+    ],
+    "category": "Meslekler",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-101",
+    "word": "Bilgisayar",
+    "forbidden": [
+      "Ekran",
+      "Klavye",
+      "Fare",
+      "İnternet",
+      "Teknoloji"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-102",
+    "word": "Telefon",
+    "forbidden": [
+      "Aramak",
+      "Mesaj",
+      "Ekran",
+      "Numara",
+      "Konuşmak"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-103",
+    "word": "İnternet",
+    "forbidden": [
+      "Ağ",
+      "Bağlantı",
+      "Site",
+      "Çevrim içi",
+      "Tarayıcı"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-104",
+    "word": "Klavye",
+    "forbidden": [
+      "Tuş",
+      "Yazmak",
+      "Harf",
+      "Bilgisayar",
+      "Boşluk"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-105",
+    "word": "Yazıcı",
+    "forbidden": [
+      "Kâğıt",
+      "Mürekkep",
+      "Baskı",
+      "Belge",
+      "Kartuş"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-106",
+    "word": "Şarj",
+    "forbidden": [
+      "Pil",
+      "Kablo",
+      "Enerji",
+      "Dolmak",
+      "Adaptör"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-107",
+    "word": "Kulaklık",
+    "forbidden": [
+      "Müzik",
+      "Kulak",
+      "Ses",
+      "Kablo",
+      "Dinlemek"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-108",
+    "word": "Kamera",
+    "forbidden": [
+      "Fotoğraf",
+      "Video",
+      "Lens",
+      "Çekim",
+      "Görüntü"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-109",
+    "word": "Robot",
+    "forbidden": [
+      "Makine",
+      "Otomatik",
+      "Program",
+      "Metal",
+      "Yapay zekâ"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-110",
+    "word": "Uydu",
+    "forbidden": [
+      "Yörünge",
+      "Uzay",
+      "Sinyal",
+      "Dünya",
+      "İletişim"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-111",
+    "word": "Şifre",
+    "forbidden": [
+      "Gizli",
+      "Parola",
+      "Güvenlik",
+      "Giriş",
+      "Karakter"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-112",
+    "word": "Uygulama",
+    "forbidden": [
+      "Telefon",
+      "Yazılım",
+      "İndirmek",
+      "Simge",
+      "Mağaza"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-113",
+    "word": "E-posta",
+    "forbidden": [
+      "İleti",
+      "Adres",
+      "Göndermek",
+      "Gelen kutusu",
+      "Ek"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-114",
+    "word": "Dosya",
+    "forbidden": [
+      "Belge",
+      "Klasör",
+      "Kaydetmek",
+      "Uzantı",
+      "Bilgisayar"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-115",
+    "word": "Bellek",
+    "forbidden": [
+      "Hafıza",
+      "Veri",
+      "Depolama",
+      "Kapasite",
+      "Bilgisayar"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-116",
+    "word": "İşlemci",
+    "forbidden": [
+      "Çip",
+      "Hız",
+      "Bilgisayar",
+      "Çekirdek",
+      "Hesaplama"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-117",
+    "word": "Yazılım",
+    "forbidden": [
+      "Kod",
+      "Program",
+      "Geliştirici",
+      "Bilgisayar",
+      "Uygulama"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-118",
+    "word": "Algoritma",
+    "forbidden": [
+      "Adım",
+      "İşlem",
+      "Sıra",
+      "Çözüm",
+      "Mantık"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-119",
+    "word": "Veri",
+    "forbidden": [
+      "Bilgi",
+      "Kayıt",
+      "Analiz",
+      "Sayı",
+      "İşlemek"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-120",
+    "word": "Barkod",
+    "forbidden": [
+      "Çizgi",
+      "Okuyucu",
+      "Ürün",
+      "Kasa",
+      "Etiket"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-121",
+    "word": "Karekod",
+    "forbidden": [
+      "Kamera",
+      "Kare",
+      "Taramak",
+      "Bağlantı",
+      "Telefon"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-122",
+    "word": "Dokunmatik",
+    "forbidden": [
+      "Ekran",
+      "Parmak",
+      "Kaydırmak",
+      "Telefon",
+      "Algılamak"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-123",
+    "word": "Güncelleme",
+    "forbidden": [
+      "Sürüm",
+      "Yeni",
+      "İndirmek",
+      "Yazılım",
+      "Yenilemek"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-124",
+    "word": "Yedekleme",
+    "forbidden": [
+      "Kopya",
+      "Veri",
+      "Kayıp",
+      "Saklamak",
+      "Geri yüklemek"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-125",
+    "word": "Üç boyutlu yazıcı",
+    "forbidden": [
+      "Katman",
+      "Model",
+      "Plastik",
+      "Üretmek",
+      "Baskı"
+    ],
+    "category": "Teknoloji",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-126",
+    "word": "Gökkuşağı",
+    "forbidden": [
+      "Yağmur",
+      "Renk",
+      "Güneş",
+      "Gökyüzü",
+      "Yedi"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-127",
+    "word": "Orman",
+    "forbidden": [
+      "Ağaç",
+      "Yeşil",
+      "Yaprak",
+      "Hayvan",
+      "Doğa"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-128",
+    "word": "Şelale",
+    "forbidden": [
+      "Su",
+      "Yüksek",
+      "Akmak",
+      "Nehir",
+      "Kayalık"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-129",
+    "word": "Volkan",
+    "forbidden": [
+      "Lav",
+      "Yanardağ",
+      "Patlamak",
+      "Krater",
+      "Sıcak"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-130",
+    "word": "Deprem",
+    "forbidden": [
+      "Sarsıntı",
+      "Fay",
+      "Yer",
+      "Kırılmak",
+      "Bina"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-131",
+    "word": "Bulut",
+    "forbidden": [
+      "Gökyüzü",
+      "Beyaz",
+      "Yağmur",
+      "Pamuk",
+      "Hava"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-132",
+    "word": "Kar",
+    "forbidden": [
+      "Beyaz",
+      "Kış",
+      "Soğuk",
+      "Lapa",
+      "Yağmak"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-133",
+    "word": "Rüzgâr",
+    "forbidden": [
+      "Esinti",
+      "Hava",
+      "Uçurmak",
+      "Fırtına",
+      "Yel"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-134",
+    "word": "Göl",
+    "forbidden": [
+      "Su",
+      "Tatlı",
+      "Kıyı",
+      "Balık",
+      "Durgun"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-135",
+    "word": "Nehir",
+    "forbidden": [
+      "Akarsu",
+      "Yatak",
+      "Köprü",
+      "Akmak",
+      "Kaynak"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-136",
+    "word": "Okyanus",
+    "forbidden": [
+      "Deniz",
+      "Büyük",
+      "Derin",
+      "Tuzlu",
+      "Dalga"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-137",
+    "word": "Çöl",
+    "forbidden": [
+      "Kum",
+      "Sıcak",
+      "Deve",
+      "Kurak",
+      "Vaha"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-138",
+    "word": "Mağara",
+    "forbidden": [
+      "Karanlık",
+      "Yarasa",
+      "Kaya",
+      "Sarkıt",
+      "Yer altı"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-139",
+    "word": "Ada",
+    "forbidden": [
+      "Deniz",
+      "Kara",
+      "Çevrili",
+      "Sahil",
+      "Vapur"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-140",
+    "word": "Yıldız",
+    "forbidden": [
+      "Gece",
+      "Gökyüzü",
+      "Parlamak",
+      "Uzay",
+      "Takımyıldız"
+    ],
+    "category": "Doğa",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-141",
+    "word": "Ay",
+    "forbidden": [
+      "Gece",
+      "Dolunay",
+      "Uydu",
+      "Krater",
+      "Dünya"
+    ],
+    "category": "Doğa",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-142",
+    "word": "Güneş",
+    "forbidden": [
+      "Işık",
+      "Sıcak",
+      "Yıldız",
+      "Gündüz",
+      "Doğmak"
+    ],
+    "category": "Doğa",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-143",
+    "word": "Kelebek",
+    "forbidden": [
+      "Kanat",
+      "Tırtıl",
+      "Koza",
+      "Çiçek",
+      "Uçmak"
+    ],
+    "category": "Doğa",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-144",
+    "word": "Arı",
+    "forbidden": [
+      "Bal",
+      "Kovan",
+      "İğne",
+      "Çiçek",
+      "Vızıldamak"
+    ],
+    "category": "Doğa",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-145",
+    "word": "Karınca",
+    "forbidden": [
+      "Yuva",
+      "Çalışkan",
+      "Böcek",
+      "Küçük",
+      "Koloni"
+    ],
+    "category": "Doğa",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-146",
+    "word": "Kaplumbağa",
+    "forbidden": [
+      "Kabuk",
+      "Yavaş",
+      "Sürüngen",
+      "Yumurta",
+      "Kara"
+    ],
+    "category": "Doğa",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-147",
+    "word": "Penguen",
+    "forbidden": [
+      "Kutup",
+      "Buz",
+      "Kuş",
+      "Siyah",
+      "Beyaz"
+    ],
+    "category": "Doğa",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-148",
+    "word": "Zürafa",
+    "forbidden": [
+      "Boyun",
+      "Uzun",
+      "Benek",
+      "Savana",
+      "Hayvan"
+    ],
+    "category": "Doğa",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-149",
+    "word": "Papatya",
+    "forbidden": [
+      "Çiçek",
+      "Beyaz",
+      "Sarı",
+      "Yaprak",
+      "Bahar"
+    ],
+    "category": "Doğa",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-150",
+    "word": "Çam",
+    "forbidden": [
+      "Ağaç",
+      "İğne",
+      "Kozalak",
+      "Orman",
+      "Yeşil"
+    ],
+    "category": "Doğa",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-151",
+    "word": "Sinema",
+    "forbidden": [
+      "Film",
+      "Perde",
+      "Bilet",
+      "Salon",
+      "Patlamış mısır"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-152",
+    "word": "Tiyatro",
+    "forbidden": [
+      "Sahne",
+      "Perde",
+      "Oyuncu",
+      "Replik",
+      "Seyirci"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-153",
+    "word": "Konser",
+    "forbidden": [
+      "Müzik",
+      "Sahne",
+      "Şarkıcı",
+      "Bilet",
+      "Alkış"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-154",
+    "word": "Lunapark",
+    "forbidden": [
+      "Dönme dolap",
+      "Eğlence",
+      "Oyuncak",
+      "Bilet",
+      "Çarpışan araba"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-155",
+    "word": "Karaoke",
+    "forbidden": [
+      "Şarkı",
+      "Mikrofon",
+      "Söz",
+      "Müzik",
+      "Söylemek"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-156",
+    "word": "Dans",
+    "forbidden": [
+      "Ritim",
+      "Hareket",
+      "Müzik",
+      "Adım",
+      "Pist"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-157",
+    "word": "Satranç",
+    "forbidden": [
+      "Şah",
+      "Vezir",
+      "Tahta",
+      "Mat",
+      "Hamle"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-158",
+    "word": "Tavla",
+    "forbidden": [
+      "Zar",
+      "Pul",
+      "Kapı",
+      "Tahta",
+      "Şeş"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-159",
+    "word": "Bulmaca",
+    "forbidden": [
+      "Soru",
+      "Cevap",
+      "Kare",
+      "Harf",
+      "Çözmek"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-160",
+    "word": "Yapboz",
+    "forbidden": [
+      "Parça",
+      "Resim",
+      "Birleştirmek",
+      "Kutu",
+      "Tamamlamak"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-161",
+    "word": "Saklambaç",
+    "forbidden": [
+      "Ebe",
+      "Saklanmak",
+      "Saymak",
+      "Bulmak",
+      "Oyun"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-162",
+    "word": "Körebe",
+    "forbidden": [
+      "Göz",
+      "Bağlamak",
+      "Yakalamak",
+      "Ebe",
+      "Oyun"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-163",
+    "word": "Seksek",
+    "forbidden": [
+      "Taş",
+      "Çizgi",
+      "Zıplamak",
+      "Kare",
+      "Ayak"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-164",
+    "word": "Uçurtma",
+    "forbidden": [
+      "İp",
+      "Rüzgâr",
+      "Gökyüzü",
+      "Uçmak",
+      "Kâğıt"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-165",
+    "word": "Balon",
+    "forbidden": [
+      "Hava",
+      "Şişirmek",
+      "Patlamak",
+      "İp",
+      "Renkli"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-166",
+    "word": "Sihirbaz",
+    "forbidden": [
+      "Numara",
+      "Şapka",
+      "Tavşan",
+      "Gösteri",
+      "İllüzyon"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-167",
+    "word": "Palyaço",
+    "forbidden": [
+      "Kırmızı burun",
+      "Sirk",
+      "Komik",
+      "Peruk",
+      "Makyaj"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-168",
+    "word": "Festival",
+    "forbidden": [
+      "Etkinlik",
+      "Konser",
+      "Kalabalık",
+      "Kutlama",
+      "Sahne"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-169",
+    "word": "Pikap",
+    "forbidden": [
+      "Plak",
+      "İğne",
+      "Müzik",
+      "Dönmek",
+      "Ses"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-170",
+    "word": "Gitar",
+    "forbidden": [
+      "Tel",
+      "Pena",
+      "Akort",
+      "Müzik",
+      "Sap"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-171",
+    "word": "Piyano",
+    "forbidden": [
+      "Tuş",
+      "Siyah",
+      "Beyaz",
+      "Nota",
+      "Müzik"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-172",
+    "word": "Davul",
+    "forbidden": [
+      "Baget",
+      "Ritim",
+      "Vurmak",
+      "Deri",
+      "Çalmak"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-173",
+    "word": "Masal",
+    "forbidden": [
+      "Bir varmış",
+      "Prenses",
+      "Anlatmak",
+      "Çocuk",
+      "Peri"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-174",
+    "word": "Karikatür",
+    "forbidden": [
+      "Çizim",
+      "Mizah",
+      "Balon",
+      "Dergi",
+      "Abartı"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-175",
+    "word": "Animasyon",
+    "forbidden": [
+      "Çizgi film",
+      "Hareket",
+      "Karakter",
+      "Canlandırma",
+      "Sinema"
+    ],
+    "category": "Eğlence",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-176",
+    "word": "Düğün",
+    "forbidden": [
+      "Gelin",
+      "Damat",
+      "Evlilik",
+      "Pasta",
+      "Dans"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-177",
+    "word": "Bayram",
+    "forbidden": [
+      "Ziyaret",
+      "Şeker",
+      "Tatil",
+      "Kutlama",
+      "Aile"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-178",
+    "word": "Kına gecesi",
+    "forbidden": [
+      "Gelin",
+      "El",
+      "Kırmızı",
+      "Türkü",
+      "Düğün"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-179",
+    "word": "Halk oyunu",
+    "forbidden": [
+      "Yöre",
+      "Kostüm",
+      "Dans",
+      "Topluluk",
+      "Müzik"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-180",
+    "word": "Horon",
+    "forbidden": [
+      "Karadeniz",
+      "Kemençe",
+      "El ele",
+      "Hızlı",
+      "Oyun"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-181",
+    "word": "Zeybek",
+    "forbidden": [
+      "Efe",
+      "Ege",
+      "Ağır",
+      "Dans",
+      "Kollar"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-182",
+    "word": "Ebru",
+    "forbidden": [
+      "Su",
+      "Boya",
+      "Desen",
+      "Kâğıt",
+      "Sanat"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-183",
+    "word": "Çini",
+    "forbidden": [
+      "Seramik",
+      "Desen",
+      "Mavi",
+      "İznik",
+      "Süsleme"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-184",
+    "word": "Hat sanatı",
+    "forbidden": [
+      "Yazı",
+      "Kalem",
+      "Mürekkep",
+      "Harf",
+      "Estetik"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-185",
+    "word": "Minyatür",
+    "forbidden": [
+      "Resim",
+      "Küçük",
+      "Kitap",
+      "Osmanlı",
+      "Ayrıntı"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-186",
+    "word": "Müze",
+    "forbidden": [
+      "Eser",
+      "Sergi",
+      "Tarih",
+      "Vitrin",
+      "Ziyaret"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-187",
+    "word": "Kütüphane",
+    "forbidden": [
+      "Kitap",
+      "Raf",
+      "Sessiz",
+      "Okumak",
+      "Ödünç"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-188",
+    "word": "Roman",
+    "forbidden": [
+      "Kitap",
+      "Yazar",
+      "Karakter",
+      "Kurgu",
+      "Bölüm"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-189",
+    "word": "Şiir",
+    "forbidden": [
+      "Dize",
+      "Şair",
+      "Kafiye",
+      "Duygu",
+      "Kıta"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-190",
+    "word": "Atasözü",
+    "forbidden": [
+      "Öğüt",
+      "Anonim",
+      "Deneyim",
+      "Söz",
+      "Kalıp"
+    ],
+    "category": "Kültür",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-191",
+    "word": "Deyim",
+    "forbidden": [
+      "Mecaz",
+      "İfade",
+      "Kalıp",
+      "Anlam",
+      "Söz"
+    ],
+    "category": "Kültür",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-192",
+    "word": "Destan",
+    "forbidden": [
+      "Kahraman",
+      "Uzun",
+      "Anlatı",
+      "Millet",
+      "Efsane"
+    ],
+    "category": "Kültür",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-193",
+    "word": "Efsane",
+    "forbidden": [
+      "Rivayet",
+      "Hikâye",
+      "Olağanüstü",
+      "İnanç",
+      "Anlatı"
+    ],
+    "category": "Kültür",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-194",
+    "word": "Türkü",
+    "forbidden": [
+      "Halk",
+      "Ezgi",
+      "Saz",
+      "Yöre",
+      "Söylemek"
+    ],
+    "category": "Kültür",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-195",
+    "word": "Bağlama",
+    "forbidden": [
+      "Saz",
+      "Tel",
+      "Tezene",
+      "Türkü",
+      "Çalmak"
+    ],
+    "category": "Kültür",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-196",
+    "word": "Ney",
+    "forbidden": [
+      "Üflemek",
+      "Kamış",
+      "Müzik",
+      "Tasavvuf",
+      "Delik"
+    ],
+    "category": "Kültür",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-197",
+    "word": "Karagöz",
+    "forbidden": [
+      "Hacivat",
+      "Gölge",
+      "Perde",
+      "Kukla",
+      "Gösteri"
+    ],
+    "category": "Kültür",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-198",
+    "word": "Nasreddin Hoca",
+    "forbidden": [
+      "Fıkra",
+      "Eşek",
+      "Akşehir",
+      "Mizah",
+      "Kazan"
+    ],
+    "category": "Kültür",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-199",
+    "word": "Ramazan",
+    "forbidden": [
+      "Oruç",
+      "İftar",
+      "Sahur",
+      "Mahya",
+      "Ay"
+    ],
+    "category": "Kültür",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-200",
+    "word": "Nevruz",
+    "forbidden": [
+      "Bahar",
+      "Mart",
+      "Kutlama",
+      "Ateş",
+      "Yenilenme"
+    ],
+    "category": "Kültür",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-201",
+    "word": "Tatil",
+    "forbidden": [
+      "Deniz",
+      "Dinlenmek",
+      "Otel",
+      "Yaz",
+      "Seyahat"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-202",
+    "word": "Valiz",
+    "forbidden": [
+      "Bavul",
+      "Eşya",
+      "Tekerlek",
+      "Yolculuk",
+      "Paketlemek"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-203",
+    "word": "Pasaport",
+    "forbidden": [
+      "Kimlik",
+      "Ülke",
+      "Yurt dışı",
+      "Damga",
+      "Sınır"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-204",
+    "word": "Vize",
+    "forbidden": [
+      "İzin",
+      "Konsolosluk",
+      "Pasaport",
+      "Ülke",
+      "Başvuru"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-205",
+    "word": "Havaalanı",
+    "forbidden": [
+      "Uçak",
+      "Terminal",
+      "Pist",
+      "Bavul",
+      "Uçuş"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-206",
+    "word": "Tren",
+    "forbidden": [
+      "Ray",
+      "Vagon",
+      "İstasyon",
+      "Lokomotif",
+      "Demiryolu"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-207",
+    "word": "Otobüs",
+    "forbidden": [
+      "Durak",
+      "Yolcu",
+      "Şoför",
+      "Bilet",
+      "Koltuk"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-208",
+    "word": "Vapur",
+    "forbidden": [
+      "Deniz",
+      "İskele",
+      "Yolcu",
+      "Martı",
+      "Boğaz"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-209",
+    "word": "Otel",
+    "forbidden": [
+      "Oda",
+      "Konaklama",
+      "Resepsiyon",
+      "Gece",
+      "Rezervasyon"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-210",
+    "word": "Pansiyon",
+    "forbidden": [
+      "Konaklama",
+      "Küçük",
+      "Oda",
+      "Tatil",
+      "Ev"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-211",
+    "word": "Kamp",
+    "forbidden": [
+      "Çadır",
+      "Ateş",
+      "Doğa",
+      "Uyku tulumu",
+      "Gece"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-212",
+    "word": "Harita",
+    "forbidden": [
+      "Yön",
+      "Yol",
+      "Ölçek",
+      "Konum",
+      "Çizim"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-213",
+    "word": "Pusula",
+    "forbidden": [
+      "Kuzey",
+      "İbre",
+      "Yön",
+      "Manyetik",
+      "Güney"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-214",
+    "word": "Rehber",
+    "forbidden": [
+      "Tur",
+      "Anlatmak",
+      "Gezi",
+      "Bilgi",
+      "Grup"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-215",
+    "word": "Bilet",
+    "forbidden": [
+      "Yolculuk",
+      "Koltuk",
+      "Ücret",
+      "Sefer",
+      "Rezervasyon"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-216",
+    "word": "İskele",
+    "forbidden": [
+      "Vapur",
+      "Kıyı",
+      "Yanaşmak",
+      "Deniz",
+      "Tahta"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-217",
+    "word": "Liman",
+    "forbidden": [
+      "Gemi",
+      "Yük",
+      "Deniz",
+      "Rıhtım",
+      "Konteyner"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-218",
+    "word": "Teleferik",
+    "forbidden": [
+      "Kabin",
+      "Dağ",
+      "Kablo",
+      "Yüksek",
+      "Ulaşım"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-219",
+    "word": "Kapadokya",
+    "forbidden": [
+      "Balon",
+      "Peribacası",
+      "Nevşehir",
+      "Turizm",
+      "Vadi"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-220",
+    "word": "Pamukkale",
+    "forbidden": [
+      "Traverten",
+      "Beyaz",
+      "Denizli",
+      "Termal",
+      "Turizm"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-221",
+    "word": "Efes",
+    "forbidden": [
+      "Antik",
+      "İzmir",
+      "Kent",
+      "Kütüphane",
+      "Harabe"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-222",
+    "word": "Boğaz köprüsü",
+    "forbidden": [
+      "İstanbul",
+      "Asya",
+      "Avrupa",
+      "Geçiş",
+      "Trafik"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-223",
+    "word": "Sahil",
+    "forbidden": [
+      "Deniz",
+      "Kıyı",
+      "Kum",
+      "Dalga",
+      "Yürüyüş"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-224",
+    "word": "Yayla",
+    "forbidden": [
+      "Dağ",
+      "Serin",
+      "Yüksek",
+      "Çimen",
+      "Yaz"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-225",
+    "word": "Rezervasyon",
+    "forbidden": [
+      "Ayırtmak",
+      "Otel",
+      "Tarih",
+      "Oda",
+      "Önceden"
+    ],
+    "category": "Seyahat",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-226",
+    "word": "Şemsiye",
+    "forbidden": [
+      "Yağmur",
+      "Islanmak",
+      "Açmak",
+      "Sap",
+      "Korumak"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-227",
+    "word": "Anahtar",
+    "forbidden": [
+      "Kilit",
+      "Kapı",
+      "Açmak",
+      "Metal",
+      "Diş"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-228",
+    "word": "Gözlük",
+    "forbidden": [
+      "Cam",
+      "Görmek",
+      "Çerçeve",
+      "Numara",
+      "Burun"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-229",
+    "word": "Saat",
+    "forbidden": [
+      "Zaman",
+      "Akrep",
+      "Yelkovan",
+      "Dakika",
+      "Bilek"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-230",
+    "word": "Makas",
+    "forbidden": [
+      "Kesmek",
+      "Kâğıt",
+      "İki",
+      "Bıçak",
+      "Sap"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-231",
+    "word": "Kalem",
+    "forbidden": [
+      "Yazmak",
+      "Uç",
+      "Mürekkep",
+      "Kâğıt",
+      "Silgi"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-232",
+    "word": "Defter",
+    "forbidden": [
+      "Sayfa",
+      "Çizgi",
+      "Yazmak",
+      "Kapak",
+      "Okul"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-233",
+    "word": "Kitap",
+    "forbidden": [
+      "Sayfa",
+      "Okumak",
+      "Yazar",
+      "Kapak",
+      "Basım"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-234",
+    "word": "Ayna",
+    "forbidden": [
+      "Yansıma",
+      "Cam",
+      "Bakmak",
+      "Yüz",
+      "Görüntü"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-235",
+    "word": "Yastık",
+    "forbidden": [
+      "Yatak",
+      "Baş",
+      "Yumuşak",
+      "Kılıf",
+      "Uyumak"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-236",
+    "word": "Battaniye",
+    "forbidden": [
+      "Örtü",
+      "Sıcak",
+      "Yün",
+      "Yatak",
+      "Kış"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-237",
+    "word": "Sandalye",
+    "forbidden": [
+      "Oturmak",
+      "Ayak",
+      "Sırt",
+      "Masa",
+      "Koltuk"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-238",
+    "word": "Merdiven",
+    "forbidden": [
+      "Basamak",
+      "Çıkmak",
+      "İnmek",
+      "Kat",
+      "Yüksek"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-239",
+    "word": "Çekiç",
+    "forbidden": [
+      "Çivi",
+      "Vurmak",
+      "Sap",
+      "Alet",
+      "Tamir"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-240",
+    "word": "Tornavida",
+    "forbidden": [
+      "Vida",
+      "Çevirmek",
+      "Uç",
+      "Sap",
+      "Tamir"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Kolay"
+  },
+  {
+    "id": "tabu-241",
+    "word": "Fener",
+    "forbidden": [
+      "Işık",
+      "Karanlık",
+      "Pil",
+      "Aydınlatmak",
+      "El"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-242",
+    "word": "Termos",
+    "forbidden": [
+      "Sıcak",
+      "Soğuk",
+      "İçecek",
+      "Kapak",
+      "Korumak"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-243",
+    "word": "Kumbara",
+    "forbidden": [
+      "Para",
+      "Birikim",
+      "Bozuk",
+      "Atmak",
+      "Tasarruf"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-244",
+    "word": "Mum",
+    "forbidden": [
+      "Fitil",
+      "Alev",
+      "Balmumu",
+      "Işık",
+      "Erimek"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-245",
+    "word": "Tarak",
+    "forbidden": [
+      "Saç",
+      "Diş",
+      "Düzeltmek",
+      "Fırça",
+      "Bakım"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-246",
+    "word": "Diş fırçası",
+    "forbidden": [
+      "Macun",
+      "Ağız",
+      "Temizlemek",
+      "Kıl",
+      "Sap"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-247",
+    "word": "Çanta",
+    "forbidden": [
+      "Eşya",
+      "Taşımak",
+      "Askı",
+      "Fermuar",
+      "Cep"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-248",
+    "word": "Cüzdan",
+    "forbidden": [
+      "Para",
+      "Kart",
+      "Cep",
+      "Deri",
+      "Kimlik"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Orta"
+  },
+  {
+    "id": "tabu-249",
+    "word": "Düdük",
+    "forbidden": [
+      "Ses",
+      "Üflemek",
+      "Hakem",
+      "Uyarı",
+      "Keskin"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Zor"
+  },
+  {
+    "id": "tabu-250",
+    "word": "Zımba",
+    "forbidden": [
+      "Kâğıt",
+      "Tel",
+      "Birleştirmek",
+      "Basmak",
+      "Ofis"
+    ],
+    "category": "Nesneler",
+    "difficulty": "Zor"
+  }
+]
