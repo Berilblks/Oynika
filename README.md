@@ -1,31 +1,100 @@
-# Oynika — Faz 1
+# Oynika
 
-Arkadaş ortamlarında oynanabilecek, Türkçe ve çevrimdışı bir parti oyunları uygulaması. Faz 1 yalnızca proje altyapısını ve geçici ana ekranı içerir. Backend, veritabanı, üyelik veya giriş sistemi yoktur. Oyunlar henüz oynanamaz.
+Arkadaş ortamlarında oynanan beş parti oyununu bir araya getiren, Türkçe ve çevrimdışı Flutter uygulaması. Backend, üyelik ve giriş sistemi yoktur.
+
+Faz 1 altyapısı tamamlandı. **Faz 2** onaylanan ana ekran tasarımını, oyun tanıtımlarını, alt navigasyonu ve tema seçimini içerir. Oyun mekanikleri ve soru/kelime havuzları henüz yoktur.
 
 ## Teknolojiler
+
 - Flutter 3.29.0 / Dart 3.7.0
-- Material 3, sistem ayarına göre açık/koyu tema
-- flutter_riverpod 3.3.2: uygulama kapsamı ve router yaşam döngüsü
-- go_router 17.0.0: yönlendirme
-- flutter_lints 5.0.0 ve Flutter SDK widget testleri
-- Android ve iOS uygulama kimliği: com.oynika.app
+- Material 3
+- flutter_riverpod 3.3.2
+- go_router 17.0.0
+- flutter_lints 5.0.0, Flutter SDK widget testleri
+- Uygulamaya gömülü Nunito yazı tipi ve yerel PNG illüstrasyonları
+- Android / iOS uygulama kimliği: com.oynika.app
 
-Doğrudan bağımlılıklar mevcut SDK ile uyumlu kararlı sürümlerdir. Tekrarlanabilir kurulum için pubspec.lock dosyasını koruyun.
+Faz 2'de yeni paket eklenmedi. Tekrarlanabilir kurulum için pubspec.lock korunur. Uygulama sürümü: 0.1.0+1.
 
-## Klasör mimarisi
-Feature-first yapı:
-- lib/main.dart: ProviderScope ile başlangıç
-- lib/app/app.dart: uygulama yapılandırması
-- lib/app/router/app_router.dart: ana ekran (/) ve ileride eklenecek rotalar
-- lib/app/theme/app_theme.dart: renkler, ortak yazı stilleri ve temalar
-- lib/core/constants/app_dimensions.dart: boşluklar, köşe yarıçapı ve içerik genişliği
-- lib/features/home/presentation/home_screen.dart: geçici ana ekran
-- test/widget_test.dart: açılış, başlık, oyun adları ve küçük ekran/koyu tema testleri
-- android/ ve ios/: platform projeleri
+## Mimari
 
-İhtiyaç doğduğunda shared/widgets, core/utils ve features altında taboo, charades, who_am_i, five_seconds, never_have_i_ever eklenecek. Şimdilik boş dosya veya kullanılmayan sınıf oluşturulmadı.
+Feature-first yapı korunur:
 
-## Kurulum
+```text
+lib/
+  main.dart
+  app/
+    app.dart
+    router/app_router.dart
+    theme/
+      app_theme.dart
+      theme_mode_provider.dart
+  core/constants/app_dimensions.dart
+  features/
+    home/presentation/
+      home_screen.dart
+      widgets/
+        home_header.dart
+        party_banner.dart
+    games/
+      domain/party_game.dart
+      presentation/
+        games_screen.dart
+        game_intro_screen.dart
+    settings/presentation/settings_screen.dart
+  shared/widgets/
+    app_navigation_shell.dart
+    game_art.dart
+    game_card.dart
+    game_collection.dart
+    section_heading.dart
+assets/
+  fonts/
+  illustrations/
+  README.md
+design_reference/home_screen.png
+test/widget_test.dart
+android/
+ios/
+```
+
+Beş oyunun açıklamaları, renkleri, asset yolları ve temel oynanış açıklamaları PartyGame içinde tutulur. Tanıtımlar ortak GameIntroScreen şablonuyla üretilir; kullanılmayan boş oyun ekranları yoktur.
+
+## Ekranlar ve rotalar
+
+- `/`: Oynika logosu, slogan, organik mor karşılama alanı ve oyun kartları. Beyaz ok, oyunlar bölümüne animasyonla kaydırır. Üst ayarlar butonu Ayarlar sekmesini açar.
+- `/games`: Aynı oyun kartlarını kullanan oyun listesi.
+- `/settings`: Sistem/Açık/Koyu tema, hakkında, sürüm ve açık kaynak lisansları.
+- `/games/taboo`
+- `/games/charades`
+- `/games/who_am_i`
+- `/games/five_seconds`
+- `/games/never_have_i_ever`
+
+Tanıtım ekranlarında oyun adı, illüstrasyon, kısa açıklama, nasıl oynanır adımları ve geliştirme bilgisi bulunur. Geri butonu önceki ekrana döner; doğrudan açılan tanıtımlarda oyun listesine gider. Geçersiz oyun adresleri oyun listesine yönlenir.
+
+Alt navigasyon StatefulShellRoute ile üç sekmenin gezinme/kaydırma durumunu korur. Tanıtımlar sekmelerin üzerinde açılır. NavigationBar sistem safe area alanını kullanır.
+
+## Tasarım ve tema
+
+Referans: design_reference/home_screen.png. Telefon çerçevesi ve sistem çubuğu çizilmez. Ekran bir arka plan resmi değildir; kartlar, metinler, CustomPainter ile çizilen dalgalı şekil, butonlar ve navigasyon gerçek Flutter widget'larıdır.
+
+Palet: koyu mor #46309B, lavanta #E8DDFB, krem #FFF9F1, mercan #FF8C85, sarı #FFE5A8, mint #D9F5E8, açık mavi #DCE9FF. Koyu tema, pastel kartları koyu yüzeylerle harmanlar ve açık renkli metinler kullanır. Yazı stilleri AppTheme, ölçüler AppDimensions içinde merkezidir.
+
+Tema seçimi Riverpod ile uygulama açıkken korunur. Uygulama yeniden başladığında Sistem seçilir; diske kalıcı kayıt henüz eklenmedi.
+
+İlk dört kart iki sütundur; Ben Hiç... kartı tam genişliktedir. Metinler kesilmeden sarılır, içerik kaydırılabilir, tabletlerde azami genişlik 720 mantıksal pikseldir. Kartlarda hafif basma animasyonu vardır. Ayrı AI illüstrasyonları ve Nunito fontunun kaynak/lisans bilgileri assets/README.md içindedir.
+
+## Planlanan oyunlar
+
+1. Tabu
+2. Sessiz Sinema
+3. Ben Kimim?
+4. 5 Saniyede Söyle!
+5. Ben Hiç...
+
+## Kurulum ve doğrulama
+
 Flutter SDK'yı PATH'e ekleyin; Android Studio, Android SDK ve bir Android sanal cihazı kurun.
 
 ```powershell
@@ -34,46 +103,54 @@ flutter doctor
 flutter pub get
 flutter analyze
 flutter test
+flutter build apk --debug
 ```
 
-Android araçları lisans uyarısı verirse lisansları inceleyip kabul etmek için:
+Lisans uyarısı varsa lisansları inceleyip kabul etmek için:
+
 ```powershell
 flutter doctor --android-licenses
 ```
 
 ## Android emülatöründe çalıştırma
+
 ```powershell
 flutter emulators
 flutter emulators --launch Pixel_3
 flutter devices
-flutter run -d <emulator-device-id>
+flutter run -d emulator-5554
 ```
 
-flutter devices çıktısındaki gerçek emülatör kimliğini kullanın (örneğin emulator-5554). Pixel_3 bu bilgisayardaki AVD adıdır; başka bilgisayarda mevcut AVD adını kullanın.
+Pixel_3 bu bilgisayardaki AVD adıdır. Başka ortamda flutter emulators ve flutter devices çıktılarındaki kimlikleri kullanın. Bağlı telefon için flutter run -d TELEFON_KIMLIGI kullanılabilir.
 
-Debug APK:
-```powershell
-flutter build apk --debug
-```
+Debug APK: build/app/outputs/flutter-apk/app-debug.apk
 
-Çıktı: build/app/outputs/flutter-apk/app-debug.apk
+iOS yapılandırmaları korunmuştur; Windows ortamında iOS derlenmez. iOS cihaz doğrulaması macOS ve Xcode gerektirir. Yayın imzalama ayarları bu fazın dışındadır.
 
-iOS derlemesi ve cihaz doğrulaması macOS üzerinde Xcode gerektirir; Faz 1 Windows ortamında zorunlu değildir. Yayın imzalama ayarları sonraki yayın hazırlığına aittir.
+## Testler
 
-## Planlanan oyunlar
-1. Tabu
-2. Sessiz Sinema
-3. Ben Kimim?
-4. 5 Saniyede Söyle!
-5. Ben Hiç...
+Faz 1'in açılış, başlık, beş oyun ve küçük ekran kontrolleri korunup yeni tasarımın sloganına/yerleşimine uyarlandı. Faz 2'de toplam 15 widget testi:
 
-Geçici palet: Primary #7255E8, Secondary #FF725E, açık arka plan #F8F7FC. Tasarım Faz 2'de kullanıcıyla birlikte değiştirilebilir.
+- Ana ekranın hatasız açılması, slogan ve beş oyunun erişilebilir olması
+- Her kartın doğru oyun tanıtımını açması ve geri dönüş
+- Üç alt sekme, Oyunlar ekranından tanıtım, üst Ayarlar butonu
+- Sistem/Açık/Koyu seçimi ve sekmeler arasında temanın korunması
+- Karşılama okunun oyunlara kaydırması
+- Geçersiz oyun rotasının yönlendirilmesi
+- 320, 393 ve 768 piksel genişlikte koyu tema
+- 320 pikselde 1.6 kat yazı ölçeğiyle gezinme
 
-## Faz 1 doğrulaması (17 Ekim 2026)
-- flutter pub get: başarılı.
-- flutter analyze: sorun bulunmadı.
-- flutter test: 3 widget testi başarılı.
-- flutter build apk --debug: başarılı.
-- Pixel_3 / emulator-5554 üzerinde flutter run ile açılış ve beş oyun adı doğrulandı.
-- iOS derlemesi Windows ortamında çalıştırılmadı.
-- Ortam notu: flutter doctor bazı Android SDK lisanslarının kabul edilmediğini bildiriyor; mevcut debug derlemesini engellemedi. Emülatörün ilk açılışında System UI yanıt vermiyor uyarısı bir kez görüldü; Bekle seçildikten sonra uygulama açık kaldı. Uygulama çalışma zamanı kayıtlarında hata görülmedi.
+Faz 2 doğrulaması (18 Ekim 2026): pub get başarılı, analyze temiz, 15 test başarılı, debug APK başarılı. Pixel 3 emülatöründe açık/koyu tema, sekmeler ve tanıtım ekranları görsel olarak doğrulandı.
+
+## Bilinen sınırlar
+
+- Oyunlar henüz oynanamaz; tüm tanıtımlarda geliştirme bilgisi vardır.
+- Tema seçimi yalnızca oturum boyunca korunur.
+- Üretilen illüstrasyonlar referansın yeniden yorumudur; birebir aynı çizimler değildir.
+- iOS derleme/cihaz testi yapılmadı.
+
+## Faz 2.1 — resmî logo ve uygulama ikonu
+
+Resmî kaynak logo assets/branding/oynika_logo.png konumundadır. Android launcher/adaptive/monochrome ikonları, iOS AppIcon kataloğu ve native splash görselleri bu kaynaktan üretildi; yeni paket eklenmedi. Ana ekrandaki başlık ve slogan korunarak resmî logo eklendi.
+
+Üretim betiği, boyutlar, kaynak hash'i ve platform sınırlamaları: [Marka entegrasyonu](assets/branding/README.md).

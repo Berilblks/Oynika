@@ -1,7 +1,7 @@
 name: oynika
 description: "Arkadaş ortamları için çevrimdışı parti oyunları uygulaması."
 publish_to: 'none'
-version: 0.1.0
+version: 0.1.0+1
 
 environment:
   sdk: ^3.7.0
@@ -19,3 +19,21 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/branding/oynika_logo.png
+    - assets/branding/oynika_logo_borderless.png
+    - assets/illustrations/
+    - assets/fonts/OFL.txt
+  fonts:
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Variable.ttf
+          weight: 400
+        - asset: assets/fonts/Nunito-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/Nunito-Variable.ttf
+          weight: 700
+        - asset: assets/fonts/Nunito-Variable.ttf
+          weight: 800
+        - asset: assets/fonts/Nunito-Variable.ttf
+          weight: 900
