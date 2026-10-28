@@ -1,3 +1,4 @@
+import 'package:oynika/features/games/charades/data/charades_repository.dart';
 import 'package:oynika/features/games/tabu/data/card_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +23,7 @@ void main() {
     final container = ProviderContainer();
     addTearDown(container.dispose);
     await tester.runAsync(() => container.read(tabuCardsProvider.future));
+    await tester.runAsync(() => container.read(charadesCardsProvider.future));
     await tester.pumpWidget(
       UncontrolledProviderScope(container: container, child: const OynikaApp()),
     );
@@ -70,7 +72,7 @@ void main() {
     }
     await tester.ensureVisible(
       find.text(
-        'Tabu oynamaya hazır! Diğer oyunları şimdilik keşfedebilirsin.',
+        'Tabu ve Sessiz Sinema hazır! Diğer oyunları şimdilik keşfedebilirsin.',
       ),
     );
     expect(tester.takeException(), isNull);
@@ -84,7 +86,7 @@ void main() {
       await tapVisible(tester, find.byKey(ValueKey('game-card-${game.asset}')));
       expect(container.read(appRouterProvider).state.uri.path, game.path);
       expect(find.text(game.title), findsOneWidget);
-      if (game == PartyGame.taboo) {
+      if (game == PartyGame.taboo || game == PartyGame.charades) {
         expect(find.text('Takım İsimleri'), findsOneWidget);
         expect(find.text('Geliştirme aşamasında'), findsNothing);
       } else {

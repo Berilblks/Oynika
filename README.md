@@ -2,7 +2,7 @@
 
 Arkadaş ortamlarında oynanan beş parti oyununu bir araya getiren, Türkçe ve çevrimdışı Flutter uygulaması. Backend, üyelik ve giriş sistemi yoktur.
 
-Faz 1 altyapısı tamamlandı. **Faz 2** onaylanan ana ekran tasarımını, oyun tanıtımlarını, alt navigasyonu ve tema seçimini içerir. **Faz 3** ile Tabu oynanabilir durumdadır; 500 çevrimdışı Türkçe kart içerir. Diğer dört oyun tanıtım aşamasındadır.
+Faz 1 altyapısı tamamlandı. **Faz 2** onaylanan ana ekran tasarımını, oyun tanıtımlarını, alt navigasyonu ve tema seçimini içerir. **Faz 3** ile Tabu oynanabilir durumdadır; 500 çevrimdışı Türkçe kart içerir. Faz 4 ile Sessiz Sinema da 300 film ve 200 dizi kartıyla oynanabilir. Diğer üç oyun tanıtım aşamasındadır.
 
 ## Teknolojiler
 
@@ -66,7 +66,7 @@ Beş oyunun açıklamaları, renkleri, asset yolları ve temel oynanış açıkl
 - `/games`: Aynı oyun kartlarını kullanan oyun listesi.
 - `/settings`: Sistem/Açık/Koyu tema, hakkında, sürüm ve açık kaynak lisansları.
 - `/games/taboo`: Tabu kurulumu ve beş evreli gerçek oyun akışı.
-- `/games/charades`
+- `/games/charades`: Sessiz Sinema kurulumu ve beş evreli oyun akışı.
 - `/games/who_am_i`
 - `/games/five_seconds`
 - `/games/never_have_i_ever`
@@ -144,7 +144,7 @@ Faz 2 doğrulaması (18 Ekim 2026): pub get başarılı, analyze temiz, 15 test 
 
 ## Bilinen sınırlar
 
-- Tabu oynanabilir; diğer dört oyun geliştirme aşamasındadır.
+- Tabu ve Sessiz Sinema oynanabilir; diğer üç oyun geliştirme aşamasındadır.
 - Tema seçimi yalnızca oturum boyunca korunur.
 - Üretilen illüstrasyonlar referansın yeniden yorumudur; birebir aynı çizimler değildir.
 - iOS derleme/cihaz testi yapılmadı.
@@ -166,3 +166,7 @@ Tabu güncel kuralı: tur sınırı yoktur; 10/15/20/25/30 hedef puanından seç
 Her Tabu turunda en fazla 3 pas kullanılabilir. Oynanışta küçük süre kapsülü ve aktif takımın puan/hedefi gösterilir. Tur Sonu ekranında iki pastel toplam skor kartı ve yalnızca Sonraki Takım butonu bulunur.
 
 Faz 3.1: mevcut 250 kart korunarak 250 yeni kart eklendi. Her kategoride 50 kart bulunur. Veri doğrulaması, içerik yaklaşımı ve yeni örnekler: [500 kartlık havuz raporu](docs/tabu_phase31.md).
+
+## Faz 4 — Sessiz Sinema
+
+500 yapım kartı (300 Film / 200 Dizi), sınırsız dönüşümlü tur, hedef puan, üç pas ve konuşmadan anlatım. Ekranlar, mimari, kaynak doğrulaması, 30 örnek ve test bilgileri: [Faz 4 raporu](docs/charades_phase4.md). Yeni bağımlılık eklenmedi.
