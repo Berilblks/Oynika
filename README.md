@@ -2,7 +2,7 @@
 
 Arkadaş ortamlarında oynanan beş parti oyununu bir araya getiren, Türkçe ve çevrimdışı Flutter uygulaması. Backend, üyelik ve giriş sistemi yoktur.
 
-Faz 1 altyapısı tamamlandı. **Faz 2** onaylanan ana ekran tasarımını, oyun tanıtımlarını, alt navigasyonu ve tema seçimini içerir. **Faz 3** ile Tabu oynanabilir durumdadır; 250 çevrimdışı Türkçe kart içerir. Diğer dört oyun tanıtım aşamasındadır.
+Faz 1 altyapısı tamamlandı. **Faz 2** onaylanan ana ekran tasarımını, oyun tanıtımlarını, alt navigasyonu ve tema seçimini içerir. **Faz 3** ile Tabu oynanabilir durumdadır; 500 çevrimdışı Türkçe kart içerir. Diğer dört oyun tanıtım aşamasındadır.
 
 ## Teknolojiler
 
@@ -157,10 +157,12 @@ Resmî kaynak logo assets/branding/oynika_logo.png konumundadır. Android launch
 
 ## Faz 3 — oynanabilir Tabu
 
-Kurallar, mimari, 250 kartın kategori/zorluk dağılımı, araştırma kaynakları, testler ve emülatör doğrulaması: [Faz 3 teknik notları](docs/tabu_phase3.md).
+Kurallar, mimari, 500 kartın kategori/zorluk dağılımı, araştırma kaynakları, testler ve emülatör doğrulaması: [Faz 3 teknik notları](docs/tabu_phase3.md).
 
-Modül: lib/features/games/tabu/ (domain, data, application, presentation). Kart asset'i: assets/data/tabu_cards.json. Yeni testler: test/tabu_controller_test.dart ve test/tabu_widget_test.dart. Toplam 64 test; oyun oturumu yalnızca bellekte tutulur.
+Modül: lib/features/games/tabu/ (domain, data, application, presentation). Kart asset'i: assets/data/tabu_cards.json. Yeni testler: test/tabu_controller_test.dart ve test/tabu_widget_test.dart. Toplam 72 test; oyun oturumu yalnızca bellekte tutulur.
 
 Tabu güncel kuralı: tur sınırı yoktur; 10/15/20/25/30 hedef puanından seçilene ilk ulaşan takım kazanır. Varsayılan hedef 20'dir. Kart havuzu tükenince yeniden karıştırılır ve oyun sürer.
 
 Her Tabu turunda en fazla 3 pas kullanılabilir. Oynanışta küçük süre kapsülü ve aktif takımın puan/hedefi gösterilir. Tur Sonu ekranında iki pastel toplam skor kartı ve yalnızca Sonraki Takım butonu bulunur.
+
+Faz 3.1: mevcut 250 kart korunarak 250 yeni kart eklendi. Her kategoride 50 kart bulunur. Veri doğrulaması, içerik yaklaşımı ve yeni örnekler: [500 kartlık havuz raporu](docs/tabu_phase31.md).

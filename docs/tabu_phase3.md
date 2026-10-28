@@ -34,7 +34,7 @@ Nunito ve mevcut Oynika paleti kullanılır. Taç vektörle, kupa Material simge
 
 ## İçerik ve araştırma
 
-`assets/data/tabu_cards.json`: 250 Türkçe kart; her kartta hedef, tam beş yasaklı kelime, kategori ve zorluk bulunur. Her kategoride 25 kart vardır: Günlük yaşam, Yemek ve içecek, Spor, Meslekler, Teknoloji, Doğa, Eğlence, Kültür, Seyahat, Nesneler. Dağılım 150 Kolay (%60), 80 Orta (%32), 20 Zor (%8). Kategori/zorluk filtresi bu fazda yoktur.
+`assets/data/tabu_cards.json`: 500 Türkçe kart; her kartta hedef, tam beş yasaklı kelime, kategori ve zorluk bulunur. Her kategoride 50 kart vardır: Günlük yaşam, Yemek ve içecek, Spor, Meslekler, Teknoloji, Doğa, Eğlence, Kültür, Seyahat, Nesneler. Dağılım 300 Kolay (%60), 160 Orta (%32), 40 Zor (%8). Kategori/zorluk filtresi bu fazda yoktur.
 
 19 Ekim 2026 araştırması:
 
@@ -47,7 +47,7 @@ Başka oyunun listesi toplu kopyalanmadı. Kartlar proje için yaygın Türkçe 
 
 ## Doğrulama
 
-`flutter analyze` ve `flutter test` kullanılır. Toplam 64 test; önceki uygulama testleri korunup oynanabilir Tabu rotasına uyarlandı. Oyun kuralı/saat/veri testleri ve küçük ekran widget testleri eklendi. Zaman testleri gerçek süre beklemez; Riverpod ile enjekte edilen saat ilerletilir.
+`flutter analyze` ve `flutter test` kullanılır. Toplam 72 test; önceki uygulama testleri korunup oynanabilir Tabu rotasına uyarlandı. Oyun kuralı/saat/veri testleri ve küçük ekran widget testleri eklendi. Zaman testleri gerçek süre beklemez; Riverpod ile enjekte edilen saat ilerletilir.
 
 Test kapsamı: beş hedef seçeneği, anında kazanma ve bitiş kilidi, 20 tur devam, negatif skorlar, üç pas sınırı, yeni tur/tekrar oyunda sıfırlama, duraklatma/yaşam döngüsü, deste döngüleri, tek kartlık havuz, uzun kelimeler ve adlar, küçük sayaç uyarıları, tur sonu toplam skorlar ve navigasyon. 320×568, 393×786, 768×1024; koyu tema ve büyük yazı ölçekleri kontrol edilir.
 
@@ -56,3 +56,5 @@ Debug APK `build/app/outputs/flutter-apk/app-debug.apk` konumundadır. Pixel 3 v
 ## Sınırlar
 
 Oturum bellektedir; işletim sistemi uygulamayı tamamen sonlandırırsa sıfırlanır. Sözlü doğru/tabu kararını oyuncular verir; ses tanıma yoktur. Ses, titreşim, reklam, hesap, backend ve diğer oyun mekanikleri eklenmedi. iOS derleme/cihaz kontrolü Windows üzerinde yapılmadı.
+
+Faz 3.1 veri genişletmesi ve eski 250 kartın korunduğunu doğrulayan testler için [500 kartlık havuz raporu](tabu_phase31.md).

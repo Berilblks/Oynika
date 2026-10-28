@@ -259,14 +259,14 @@ void main() {
     );
   });
 
-  test('250 özgün kart, 10 kategori ve doğru zorluk dağılımı', () {
-    expect(cards.length, 250);
+  test('500 özgün kart, 10 kategori ve doğru zorluk dağılımı', () {
+    expect(cards.length, 500);
     for (final category in tabuCategories) {
-      expect(cards.where((c) => c.category == category).length, 25);
+      expect(cards.where((c) => c.category == category).length, 50);
     }
-    expect(cards.where((c) => c.difficulty == 'Kolay').length, 150);
-    expect(cards.where((c) => c.difficulty == 'Orta').length, 80);
-    expect(cards.where((c) => c.difficulty == 'Zor').length, 20);
+    expect(cards.where((c) => c.difficulty == 'Kolay').length, 300);
+    expect(cards.where((c) => c.difficulty == 'Orta').length, 160);
+    expect(cards.where((c) => c.difficulty == 'Zor').length, 40);
     expect(cards.every((c) => c.forbidden.length == 5), isTrue);
   });
   test('Bozuk JSON kartları reddedilir', () {
