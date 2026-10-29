@@ -6,6 +6,7 @@ import '../application/game_controller.dart';
 import '../data/card_repository.dart';
 import '../domain/tabu_models.dart';
 import 'tabu_widgets.dart';
+import 'tabu_setup_widgets.dart';
 
 class TabuScreen extends ConsumerStatefulWidget {
   const TabuScreen({super.key});
@@ -16,8 +17,8 @@ class TabuScreen extends ConsumerStatefulWidget {
 class _TabuScreenState extends ConsumerState<TabuScreen>
     with WidgetsBindingObserver {
   final _form = GlobalKey<FormState>();
-  final _purple = TextEditingController(text: 'Mor Takım');
-  final _pink = TextEditingController(text: 'Pembe Takım');
+  final _blue = TextEditingController(text: 'Mavi Takım');
+  final _red = TextEditingController(text: 'Kırmızı Takım');
   int _seconds = 90;
   int _targetScore = 20;
   GameController get controller => ref.read(tabuGameProvider.notifier);
@@ -31,8 +32,8 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _purple.dispose();
-    _pink.dispose();
+    _blue.dispose();
+    _red.dispose();
     super.dispose();
   }
 
@@ -80,6 +81,7 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
   Widget build(BuildContext context) {
     final state = ref.watch(tabuGameProvider);
     final playing = state.phase == GamePhase.playing;
+    final setup = state.phase == GamePhase.setup;
     final content = switch (state.phase) {
       GamePhase.setup => _setup(),
       GamePhase.preRound => _preRound(state),
@@ -103,11 +105,21 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
             onPressed: _exit,
             icon: const Icon(Icons.arrow_back_rounded),
           ),
-          title: const Text(
-            'Tabu',
-            style: TextStyle(fontWeight: FontWeight.w900),
-          ),
+          title:
+              setup
+                  ? null
+                  : const Text(
+                    'Tabu',
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
           actions: [
+            if (setup)
+              IconButton(
+                key: const ValueKey('tabu-rules'),
+                tooltip: 'Oyun kuralları',
+                onPressed: () => showTabuRules(context),
+                icon: const Icon(Icons.info_outline_rounded),
+              ),
             if (playing)
               IconButton(
                 tooltip: state.paused ? 'Devam et' : 'Duraklat',
@@ -118,11 +130,31 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
               ),
           ],
         ),
+        bottomNavigationBar:
+            setup && MediaQuery.viewInsetsOf(context).bottom == 0
+                ? Material(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: SafeArea(
+                    top: false,
+                    minimum: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                    child: Center(
+                      heightFactor: 1,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 480),
+                        child: _startAction(),
+                      ),
+                    ),
+                  ),
+                )
+                : null,
         body: CustomPaint(
-          painter: TabuBackgroundPainter(
-            dark: Theme.of(context).brightness == Brightness.dark,
-            playing: playing,
-          ),
+          painter:
+              setup && Theme.of(context).brightness == Brightness.dark
+                  ? null
+                  : TabuBackgroundPainter(
+                    dark: Theme.of(context).brightness == Brightness.dark,
+                    playing: playing,
+                  ),
           child: SafeArea(
             top: false,
             child: LayoutBuilder(
@@ -130,9 +162,17 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
                   (context, constraints) => SingleChildScrollView(
                     padding: EdgeInsets.fromLTRB(
                       20,
-                      playing ? 4 : 12,
+                      setup
+                          ? 0
+                          : playing
+                          ? 4
+                          : 12,
                       20,
-                      playing ? 12 : 24,
+                      setup
+                          ? 8
+                          : playing
+                          ? 12
+                          : 24,
                     ),
                     child: Center(
                       child: ConstrainedBox(
@@ -153,214 +193,65 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
     );
   }
 
-  Widget _heading(String text) => Padding(
-    padding: const EdgeInsets.only(top: 20, bottom: 10),
-    child: Text(text, style: Theme.of(context).textTheme.titleMedium),
-  );
   Widget _title(String text) => Text(
     text,
     textAlign: TextAlign.center,
     style: Theme.of(context).textTheme.headlineMedium,
   );
 
-  Widget _setup() {
-    final cards = ref.watch(tabuCardsProvider);
-    return Form(
-      key: _form,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Image.asset(
-            'assets/illustrations/taboo.png',
-            height: 105,
-            fit: BoxFit.contain,
-            excludeFromSemantics: true,
-          ),
-          const Text(
-            'Kelimeleri anlat, tabuları söyleme!',
-            textAlign: TextAlign.center,
-          ),
-          _heading('Takım İsimleri'),
-          _teamField(0, _purple),
-          const SizedBox(height: 12),
-          _teamField(1, _pink),
-          _heading('Tur Süresi'),
-          Row(
-            children: [
-              for (final seconds in [60, 90, 120])
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Semantics(
-                      selected: _seconds == seconds,
-                      child: OutlinedButton(
-                        key: ValueKey('duration-$seconds'),
-                        onPressed: () => setState(() => _seconds = seconds),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          backgroundColor:
-                              _seconds == seconds
-                                  ? Theme.of(
-                                    context,
-                                  ).colorScheme.primaryContainer
-                                  : null,
-                          side: BorderSide(
-                            color:
-                                _seconds == seconds
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Colors.transparent,
-                            width: 2,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(19),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              '$seconds',
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            const Text('saniye'),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          _heading('Hedef Puan'),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              for (final target in tabuTargetScores)
-                Semantics(
-                  selected: _targetScore == target,
-                  child: OutlinedButton(
-                    key: ValueKey('target-$target'),
-                    onPressed: () => setState(() => _targetScore = target),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(88, 52),
-                      backgroundColor:
-                          _targetScore == target
-                              ? Theme.of(context).colorScheme.primaryContainer
-                              : Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerLow,
-                      side: BorderSide(
-                        color:
-                            _targetScore == target
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.transparent,
-                        width: 2,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(19),
-                      ),
-                    ),
-                    child: Text(
-                      '$target puan',
-                      style: const TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 18),
-            child: Text(
-              '2 takım • Sınırsız tur\nHedefe ilk ulaşan kazanır.',
-              textAlign: TextAlign.center,
-            ),
-          ),
-          cards.when(
-            data:
-                (deck) => TabuButton(
-                  'Oyuna Başla',
-                  onPressed: () {
-                    if (_form.currentState!.validate()) {
-                      FocusScope.of(context).unfocus();
-                      controller.configure(
-                        GameSession(
-                          names: [_purple.text, _pink.text],
-                          seconds: _seconds,
-                          targetScore: _targetScore,
-                        ),
-                        deck,
-                      );
-                    }
-                  },
-                ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error:
-                (error, stack) => Column(
-                  children: [
-                    const Text('Kartlar yüklenemedi. Lütfen tekrar dene.'),
-                    TextButton(
-                      onPressed: () => ref.invalidate(tabuCardsProvider),
-                      child: const Text('Yeniden Dene'),
-                    ),
-                  ],
-                ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _setup() => TabuSetupForm(
+    formKey: _form,
+    names: [_blue, _red],
+    seconds: _seconds,
+    target: _targetScore,
+    onSeconds: (value) => setState(() => _seconds = value),
+    onTarget: (value) => setState(() => _targetScore = value),
+  );
 
-  Widget _teamField(int index, TextEditingController editing) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    return TabuPanel(
-      color: dark ? null : tabuPastels[index],
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12, top: 12),
-            child: Icon(
-              Icons.workspace_premium_rounded,
-              color:
-                  index == 0
-                      ? const Color(0xFF8751ED)
-                      : const Color(0xFFE85B78),
-              size: 30,
-            ),
-          ),
-          Expanded(
-            child: TextFormField(
-              key: ValueKey('team-$index'),
-              controller: editing,
-              maxLength: 24,
-              decoration: InputDecoration(
-                labelText: 'Takım ${index + 1}',
-                counterText: '',
-                filled: true,
-                fillColor: Theme.of(context).colorScheme.surface,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Takım adı boş olamaz.';
-                }
-                if (turkishKey(_purple.text) == turkishKey(_pink.text)) {
-                  return 'Takım adları farklı olmalı.';
-                }
-                return null;
+  Widget _startAction() => ref
+      .watch(tabuCardsProvider)
+      .when(
+        data:
+            (deck) => TabuStartButton(
+              onPressed: () {
+                if (!_form.currentState!.validate()) return;
+                FocusScope.of(context).unfocus();
+                controller.configure(
+                  GameSession(
+                    names: [_blue.text, _red.text],
+                    seconds: _seconds,
+                    targetScore: _targetScore,
+                  ),
+                  deck,
+                );
               },
             ),
-          ),
-        ],
-      ),
-    );
-  }
+        loading: () => const TabuStartButton(onPressed: null),
+        error:
+            (error, stack) => Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Kartlar yüklenemedi. Lütfen tekrar dene.'),
+                TextButton(
+                  onPressed: () => ref.invalidate(tabuCardsProvider),
+                  child: const Text('Yeniden Dene'),
+                ),
+              ],
+            ),
+      );
+
+  List<Color> get _scoreColors =>
+      Theme.of(context).brightness == Brightness.dark
+          ? const [Color(0xFF9CC7FF), Color(0xFFFFA2B5)]
+          : TabuTeamColors.accents;
+
+  Widget _teamName(String name) => Text(
+    name,
+    textAlign: TextAlign.center,
+    style: Theme.of(
+      context,
+    ).textTheme.headlineMedium?.copyWith(color: AppTheme.ink),
+  );
 
   Widget _preRound(GameState state) => Column(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -373,7 +264,9 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
               'Sıra Kimde?',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
             ),
-            CelebrationIcon(pink: state.activeTeam == 1),
+            CelebrationIcon(
+              teamColor: TabuTeamColors.accents[state.activeTeam],
+            ),
             _title(state.teams[state.activeTeam].name),
             const SizedBox(height: 20),
             Text('Tur ${state.round + 1} • ${state.session!.seconds} saniye'),
@@ -381,6 +274,7 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
             ScoreWidget(
               teams: state.teams,
               targetScore: state.session!.targetScore,
+              teamColors: _scoreColors,
             ),
           ],
         ),
@@ -400,6 +294,9 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
         teams: [state.teams[state.activeTeam]],
         light: true,
         targetScore: state.session!.targetScore,
+        teamColors: [
+          const [Color(0xFF9CC7FF), Color(0xFFFFA2B5)][state.activeTeam],
+        ],
       ),
       SizedBox(height: MediaQuery.sizeOf(context).height < 700 ? 12 : 16),
       TimerWidget(remaining: state.remaining),
@@ -521,29 +418,33 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
     children: [
       Column(
         children: [
-          const CelebrationIcon(),
+          CelebrationIcon(teamColor: TabuTeamColors.accents[state.activeTeam]),
           _title('Tur Bitti!'),
           const SizedBox(height: 24),
           TabuPanel(
-            child: Column(
-              children: [
-                _title(state.teams[state.activeTeam].name),
-                const SizedBox(height: 10),
-                Text(
-                  '${state.correct} kelime bildi!',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
+            color: TabuTeamColors.pastels[state.activeTeam],
+            child: DefaultTextStyle.merge(
+              style: const TextStyle(color: AppTheme.ink),
+              child: Column(
+                children: [
+                  _teamName(state.teams[state.activeTeam].name),
+                  const SizedBox(height: 10),
+                  Text(
+                    '${state.correct} kelime bildi!',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text('Net puan: ${state.correct - state.taboo}'),
-                Text('${state.taboo} tabu • ${state.passed} pas'),
-              ],
+                  const SizedBox(height: 8),
+                  Text('Net puan: ${state.correct - state.taboo}'),
+                  Text('${state.taboo} tabu • ${state.passed} pas'),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 24),
-          RoundScoreCards(teams: state.teams),
+          RoundScoreCards(teams: state.teams, colors: TabuTeamColors.pastels),
         ],
       ),
       Column(
@@ -572,12 +473,15 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
           ),
           _title('Kazanan:'),
           const SizedBox(height: 20),
-          TabuPanel(child: _title(state.teams[state.winner!].name)),
+          TabuPanel(
+            color: TabuTeamColors.pastels[state.winner!],
+            child: _teamName(state.teams[state.winner!].name),
+          ),
           const SizedBox(height: 28),
           const Text('Toplam Skor'),
           Text('Hedef Puan: ${state.session!.targetScore}'),
           const SizedBox(height: 12),
-          ScoreWidget(teams: state.teams),
+          ScoreWidget(teams: state.teams, teamColors: _scoreColors),
         ],
       ),
       Column(

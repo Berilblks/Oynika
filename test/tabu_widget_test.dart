@@ -10,6 +10,7 @@ import 'package:oynika/features/games/tabu/application/game_controller.dart';
 import 'package:oynika/features/games/tabu/data/card_repository.dart';
 import 'package:oynika/features/games/tabu/domain/tabu_models.dart';
 import 'package:oynika/features/games/tabu/presentation/tabu_widgets.dart';
+import 'package:oynika/features/games/tabu/presentation/tabu_setup_widgets.dart';
 
 void main() {
   testWidgets(
@@ -191,7 +192,7 @@ void main() {
           expect(
             (tester.widget<Container>(panel).decoration! as BoxDecoration)
                 .color,
-            tabuPastels[i],
+            TabuTeamColors.pastels[i],
           );
         }
         expect(find.text('Skoru Gör'), findsNothing);
@@ -335,7 +336,7 @@ void main() {
       expect(find.text('Takım adı boş olamaz.'), findsOneWidget);
       await tester.enterText(
         find.byKey(const ValueKey('team-0')),
-        'Pembe Takım',
+        'Kırmızı Takım',
       );
       await tap(tester, 'Oyuna Başla');
       expect(find.text('Takım adları farklı olmalı.'), findsNWidgets(2));
@@ -384,7 +385,7 @@ void main() {
           container.read(tabuGameProvider).teams[activeTeam].score,
         );
         expect(
-          find.text(activeTeam == 0 ? 'Pembe Takım' : 'Mor Takım'),
+          find.text(activeTeam == 0 ? 'Kırmızı Takım' : 'Mavi Takım'),
           findsNothing,
         );
         expect(tester.takeException(), isNull);
@@ -453,4 +454,256 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+  testWidgets('Yeni ayarlar: varsayılan isim/renk, 90 saniye ve 20 puan', (
+    tester,
+  ) async {
+    final container = await open(tester);
+    expect(
+      tester
+          .widget<TextFormField>(find.byKey(const ValueKey('team-0')))
+          .controller!
+          .text,
+      'Mavi Takım',
+    );
+    expect(
+      tester
+          .widget<TextFormField>(find.byKey(const ValueKey('team-1')))
+          .controller!
+          .text,
+      'Kırmızı Takım',
+    );
+    for (var i = 0; i < 2; i++) {
+      final panel = tester.widget<Container>(
+        find.byKey(ValueKey('tabu-team-panel-$i')),
+      );
+      expect(
+        (panel.decoration as BoxDecoration).color,
+        TabuTeamColors.surfaceFor(
+          tester.element(find.byType(TabuSetupForm)),
+          i,
+        ),
+      );
+    }
+    await tester.ensureVisible(find.text('30 puan'));
+    await tester.pumpAndSettle();
+    expect(find.text('30 puan').hitTestable(), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('tabu-start')).hitTestable(),
+      findsOneWidget,
+    );
+    await tap(tester, 'Oyuna Başla');
+    final session = container.read(tabuGameProvider).session!;
+    expect(session.names, ['Mavi Takım', 'Kırmızı Takım']);
+    expect(session.seconds, 90);
+    expect(session.targetScore, 20);
+  });
+
+  for (final seconds in [60, 90, 120]) {
+    testWidgets('$seconds saniye yeni ayar ekranından aktarılır', (
+      tester,
+    ) async {
+      final container = await open(tester);
+      await tester.tap(find.byKey(ValueKey('duration-$seconds')));
+      await tap(tester, 'Oyuna Başla');
+      expect(container.read(tabuGameProvider).session!.seconds, seconds);
+    });
+  }
+
+  for (final scenario in [
+    (const Size(320, 568), 1.6),
+    (const Size(393, 786), 1.0),
+    (const Size(768, 1024), 1.4),
+  ]) {
+    testWidgets('Sabit başlat, klavye ve kaydırma: ${scenario.$1.width}', (
+      tester,
+    ) async {
+      await open(tester, size: scenario.$1, scale: scenario.$2, dark: true);
+      expect(
+        tester.getCenter(find.text('Tabu')).dx,
+        closeTo(scenario.$1.width / 2, .5),
+      );
+      expect(
+        tester
+            .getCenter(find.text('Kelimeyi anlat, yasaklı kelimeleri söyleme!'))
+            .dx,
+        closeTo(scenario.$1.width / 2, .5),
+      );
+      final start = find.byKey(const ValueKey('tabu-start'));
+      expect(start.hitTestable(), findsOneWidget);
+      final original = tester.getRect(start);
+      await tester.drag(
+        find.byType(SingleChildScrollView).first,
+        const Offset(0, -450),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.getRect(start), original);
+      await tester.ensureVisible(find.byKey(const ValueKey('team-1')));
+      await tester.tap(find.byKey(const ValueKey('team-1')));
+      tester.view.viewInsets = const FakeViewPadding(bottom: 280);
+      await tester.pumpAndSettle();
+      expect(start, findsNothing);
+      await tester.enterText(
+        find.byKey(const ValueKey('team-1')),
+        'Uzun Kırmızı Takım İsmi',
+      );
+      expect(tester.takeException(), isNull);
+      tester.view.resetViewInsets();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
+      expect(start.hitTestable(), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      addTearDown(tester.view.resetViewInsets);
+    });
+  }
+
+  testWidgets(
+    'Kurallar modalı kayar, kapatma oyunu başlatmaz ve ayarlar korunur',
+    (tester) async {
+      final container = await open(
+        tester,
+        size: const Size(320, 568),
+        scale: 1.6,
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('team-0')),
+        'Mavi Yıldızlar',
+      );
+      await tester.ensureVisible(find.byKey(const ValueKey('target-25')));
+      await tester.tap(find.byKey(const ValueKey('target-25')));
+      await tester.tap(find.byTooltip('Oyun kuralları'));
+      await tester.pumpAndSettle();
+      expect(find.text('Oyunu Nasıl Oynarız?'), findsOneWidget);
+      for (final text in [
+        'Kelimeyi anlat',
+        'Yasaklı kelimeleri söyleme',
+        'Süre dolmadan anlat',
+        'Hedef puana ulaş',
+      ]) {
+        expect(find.text(text), findsOneWidget);
+      }
+      await tester.ensureVisible(find.text('Tamam, Başlayalım!'));
+      await tap(tester, 'Tamam, Başlayalım!');
+      expect(find.text('Oyunu Nasıl Oynarız?'), findsNothing);
+      expect(container.read(tabuGameProvider).phase, GamePhase.setup);
+      await tap(tester, 'Oyuna Başla');
+      expect(
+        container.read(tabuGameProvider).session!.names.first,
+        'Mavi Yıldızlar',
+      );
+      expect(container.read(tabuGameProvider).session!.targetScore, 25);
+      expect(tester.takeException(), isNull);
+    },
+  );
+  double contrast(Color foreground, Color background) {
+    final a = foreground.computeLuminance();
+    final b = background.computeLuminance();
+    return ((a > b ? a : b) + .05) / ((a > b ? b : a) + .05);
+  }
+
+  for (final dark in [false, true]) {
+    testWidgets(
+      'Ayar/metin/buton kontrastı ve kurallar modalı: ${dark ? "koyu" : "açık"}',
+      (tester) async {
+        final container = await open(
+          tester,
+          size: const Size(320, 568),
+          scale: 1.4,
+          dark: dark,
+        );
+        final context = tester.element(find.byType(TabuSetupForm));
+        final colors = Theme.of(context).colorScheme;
+        expect(
+          Theme.of(context).brightness,
+          dark ? Brightness.dark : Brightness.light,
+        );
+        final start = find.byKey(const ValueKey('tabu-start'));
+        expect(start.hitTestable(), findsOneWidget);
+        final action = tester.widget<FilledButton>(start);
+        final background = action.style!.backgroundColor!.resolve({})!;
+        final foreground =
+            tester.widget<Text>(find.text('Oyuna Başla')).style!.color!;
+        expect(foreground, colors.onPrimary);
+        expect(contrast(foreground, background), greaterThanOrEqualTo(4.5));
+        expect(
+          tester.widget<Text>(find.text('Oyuna Başla')).style!.fontVariations,
+          AppTheme.titleWeight,
+        );
+        for (var i = 0; i < 2; i++) {
+          final panel = tester.widget<Container>(
+            find.byKey(ValueKey('tabu-team-panel-$i')),
+          );
+          final decoration = panel.decoration! as BoxDecoration;
+          expect(
+            (decoration.border! as Border).top.width,
+            lessThanOrEqualTo(1),
+          );
+          final field = tester.widget<TextField>(
+            find.descendant(
+              of: find.byKey(ValueKey('team-$i')),
+              matching: find.byType(TextField),
+            ),
+          );
+          expect(field.decoration!.filled, isFalse);
+          expect(
+            contrast(field.style!.color!, decoration.color!),
+            greaterThanOrEqualTo(4.5),
+          );
+          expect(
+            contrast(field.decoration!.labelStyle!.color!, decoration.color!),
+            greaterThanOrEqualTo(4.5),
+          );
+        }
+        for (final key in [
+          'duration-60',
+          'duration-90',
+          'target-10',
+          'target-20',
+        ]) {
+          final button = tester.widget<OutlinedButton>(
+            find.byKey(ValueKey(key)),
+          );
+          final bg = button.style!.backgroundColor!.resolve({})!;
+          final fg = button.style!.foregroundColor!.resolve({})!;
+          expect(contrast(fg, bg), greaterThanOrEqualTo(4.5), reason: key);
+          expect(
+            button.style!.side!.resolve({})!.width,
+            lessThanOrEqualTo(1.5),
+          );
+        }
+        await tester.tap(find.byKey(const ValueKey('tabu-rules')));
+        await tester.pumpAndSettle();
+        expect(find.text('Oyunu Nasıl Oynarız?'), findsOneWidget);
+        expect(
+          tester.widget<BottomSheet>(find.byType(BottomSheet)).backgroundColor,
+          colors.surface,
+        );
+        await tester.ensureVisible(find.text('Tamam, Başlayalım!'));
+        await tap(tester, 'Tamam, Başlayalım!');
+        expect(container.read(tabuGameProvider).phase, GamePhase.setup);
+        expect(start.hitTestable(), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
+  testWidgets('Sistem tema modu açık/koyu değişimini izlemeye devam eder', (
+    tester,
+  ) async {
+    final container = await open(tester);
+    container.read(themeModeProvider.notifier).select(ThemeMode.system);
+    addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+    for (final brightness in [Brightness.dark, Brightness.light]) {
+      tester.platformDispatcher.platformBrightnessTestValue = brightness;
+      await tester.pumpAndSettle();
+      expect(
+        Theme.of(tester.element(find.byType(TabuSetupForm))).brightness,
+        brightness,
+      );
+      expect(container.read(themeModeProvider), ThemeMode.system);
+      expect(
+        find.byKey(const ValueKey('tabu-start')).hitTestable(),
+        findsOneWidget,
+      );
+    }
+  });
 }

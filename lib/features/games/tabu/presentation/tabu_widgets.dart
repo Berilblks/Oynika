@@ -11,8 +11,9 @@ const tabuPastels = [
 ];
 
 class CrownPainter extends CustomPainter {
-  const CrownPainter({this.pink = false});
+  const CrownPainter({this.pink = false, this.teamColor});
   final bool pink;
+  final Color? teamColor;
   @override
   void paint(Canvas canvas, Size size) {
     canvas.save();
@@ -32,7 +33,9 @@ class CrownPainter extends CustomPainter {
         Paint()
           ..shader = LinearGradient(
             colors:
-                pink
+                teamColor != null
+                    ? [Color.lerp(teamColor, Colors.white, .4)!, teamColor!]
+                    : pink
                     ? [const Color(0xFFFFB6CC), const Color(0xFFEB4770)]
                     : [const Color(0xFFC795FF), const Color(0xFF6632E6)],
             begin: Alignment.topLeft,
@@ -58,7 +61,8 @@ class CrownPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CrownPainter oldDelegate) => pink != oldDelegate.pink;
+  bool shouldRepaint(CrownPainter oldDelegate) =>
+      pink != oldDelegate.pink || teamColor != oldDelegate.teamColor;
 }
 
 class TabuBackgroundPainter extends CustomPainter {
@@ -195,8 +199,14 @@ class TabuPanel extends StatelessWidget {
 }
 
 class CelebrationIcon extends StatelessWidget {
-  const CelebrationIcon({super.key, this.trophy = false, this.pink = false});
+  const CelebrationIcon({
+    super.key,
+    this.trophy = false,
+    this.pink = false,
+    this.teamColor,
+  });
   final bool trophy, pink;
+  final Color? teamColor;
   @override
   Widget build(BuildContext context) => SizedBox(
     height: trophy ? 142 : 94,
@@ -227,7 +237,7 @@ class CelebrationIcon extends StatelessWidget {
         if (!trophy)
           CustomPaint(
             size: const Size(90, 82),
-            painter: CrownPainter(pink: pink),
+            painter: CrownPainter(pink: pink, teamColor: teamColor),
           )
         else
           Icon(
@@ -407,8 +417,13 @@ class TimerWidget extends StatelessWidget {
 }
 
 class RoundScoreCards extends StatelessWidget {
-  const RoundScoreCards({super.key, required this.teams});
+  const RoundScoreCards({
+    super.key,
+    required this.teams,
+    this.colors = tabuPastels,
+  });
   final List<Team> teams;
+  final List<Color> colors;
 
   @override
   Widget build(BuildContext context) => IntrinsicHeight(
@@ -422,7 +437,7 @@ class RoundScoreCards extends StatelessWidget {
               key: ValueKey('round-total-$i'),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 20),
               decoration: BoxDecoration(
-                color: tabuPastels[i],
+                color: colors[i],
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Column(
@@ -467,10 +482,12 @@ class ScoreWidget extends StatelessWidget {
     required this.teams,
     this.light = false,
     this.targetScore,
+    this.teamColors,
   });
   final List<Team> teams;
   final bool light;
   final int? targetScore;
+  final List<Color>? teamColors;
   @override
   Widget build(BuildContext context) => Row(
     children: [
@@ -484,7 +501,7 @@ class ScoreWidget extends StatelessWidget {
                   teams[i].name,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: light ? Colors.white : null,
+                    color: teamColors?[i] ?? (light ? Colors.white : null),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -496,9 +513,10 @@ class ScoreWidget extends StatelessWidget {
                     fontSize: 22,
                     fontWeight: FontWeight.w900,
                     color:
-                        light
+                        teamColors?[i] ??
+                        (light
                             ? Colors.white
-                            : Theme.of(context).colorScheme.primary,
+                            : Theme.of(context).colorScheme.primary),
                   ),
                 ),
               ],
