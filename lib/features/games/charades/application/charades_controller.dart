@@ -82,7 +82,6 @@ class CharadesController extends Notifier<CharadesState> {
     if (state.phase != GamePhase.playing || state.paused) return;
     tick();
     if (state.phase != GamePhase.playing || state.card?.id != cardId) return;
-    if (outcome == CharadesOutcome.pass && state.remainingPasses <= 0) return;
     if (_lastAnswer != null &&
         _now - _lastAnswer! < const Duration(milliseconds: 350)) {
       return;

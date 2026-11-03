@@ -47,7 +47,6 @@ class CharadesState {
   final int deckCycle;
   final List<RoundScore> rounds;
   int get activeTeam => round % 2;
-  int get remainingPasses => 3 - passed;
   CharadesCard? get card =>
       cardIndex >= 0 && cardIndex < deck.length ? deck[cardIndex] : null;
   int? get targetWinner {

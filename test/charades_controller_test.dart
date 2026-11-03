@@ -108,26 +108,30 @@ void main() {
         expect(state().teams[0].name, 'Mor Takım');
         expect(state().cardIndex, -1);
         expect(state().round, 0);
-        expect(state().remainingPasses, 3);
+        expect(state().passed, 0);
         expect(state().rounds, isEmpty);
       },
     );
   }
-  test('Doğru +1, pas sıfır; üçten fazla pas kabul edilmez', () {
-    setup();
+  test('Sınırsız pas puanı değiştirmez ve deste eksiksiz döner', () {
+    setup(deck: cards.take(6).toList());
     controller.startRound();
     answer(CharadesOutcome.correct);
-    for (var i = 0; i < 3; i++) {
+    final firstCycle = <String>{};
+    final secondCycle = <String>{};
+    for (var i = 0; i < 11; i++) {
+      final id = state().card!.id;
+      expect((i < 5 ? firstCycle : secondCycle).add(id), isTrue);
       answer(CharadesOutcome.pass);
-      expect(state().remainingPasses, 2 - i);
+      expect(state().card!.id, isNot(id));
+      expect(state().passed, i + 1);
+      expect(state().teams.map((team) => team.score), [1, 0]);
     }
-    final id = state().card!.id;
-    answer(CharadesOutcome.pass);
-    expect(state().card!.id, id);
-    expect(state().teams[0].score, 1);
+    expect(secondCycle, containsAll(firstCycle));
+    expect(secondCycle, hasLength(6));
+    expect(state().deckCycle, 2);
     answer(CharadesOutcome.correct);
     expect(state().teams[0].score, 2);
-    expect(state().remainingPasses, 0);
   });
   test('Aynı kart ve hızlı çift tıklama iki puan üretmez', () {
     setup();
@@ -140,7 +144,7 @@ void main() {
     expect(state().cardIndex, 1);
   });
   test(
-    'Süre sonunda mevcut karta puan verilmez, sonraki takımda pas üç olur',
+    'Süre sonunda mevcut karta puan verilmez, sonraki takımda tur pas sayısı sıfırlanır',
     () {
       setup();
       controller.startRound();
@@ -153,7 +157,7 @@ void main() {
       expect(state().rounds.single.passed, 1);
       controller.nextRound();
       expect(state().activeTeam, 1);
-      expect(state().remainingPasses, 3);
+      expect(state().passed, 0);
       controller.startRound();
       expect(state().card!.id, isNot(id));
     },
@@ -170,7 +174,7 @@ void main() {
     controller.answer(before.card!.id, CharadesOutcome.correct);
     expect(state().remaining, before.remaining);
     expect(state().card!.id, before.card!.id);
-    expect(state().remainingPasses, 2);
+    expect(state().passed, 1);
     expect(state().teams[0].score, 0);
     controller.resume();
     now += const Duration(seconds: 1);
@@ -200,7 +204,7 @@ void main() {
     for (var i = 0; i < 500; i++) {
       final id = state().card!.id;
       expect(seen.add(id), isTrue);
-      // End rounds rather than scoring: target and three-pass rules stay real.
+      // Keep the deck moving across team changes.
       finish();
       controller.nextRound();
       controller.startRound();
@@ -220,6 +224,6 @@ void main() {
     controller.startRound();
     answer(CharadesOutcome.pass);
     expect(state().deckCycle, 1);
-    expect(state().remainingPasses, 2);
+    expect(state().passed, 1);
   });
 }

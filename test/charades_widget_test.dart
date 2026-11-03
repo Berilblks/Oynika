@@ -53,6 +53,71 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  for (final dark in [false, true]) {
+    testWidgets('Yeni ayarlar: tema, sabit buton, klavye ve kurallar $dark', (
+      tester,
+    ) async {
+      final c = await open(
+        tester,
+        size: const Size(320, 568),
+        scale: 1.6,
+        dark: dark,
+      );
+      expect(tester.widget<AppBar>(find.byType(AppBar)).title, isNull);
+      expect(find.text('Sessiz Sinema'), findsOneWidget);
+      expect(find.text('Mavi Takım'), findsOneWidget);
+      expect(find.text('Kırmızı Takım'), findsOneWidget);
+      final start = find.byKey(const ValueKey('charades-start'));
+      final rect = tester.getRect(start);
+      await tester.ensureVisible(find.text('30 puan'));
+      expect(tester.getRect(start), rect);
+      await tester.tap(find.byKey(const ValueKey('charades-rules')));
+      await tester.pumpAndSettle();
+      expect(find.text('Sessiz Sinema Nasıl Oynanır?'), findsOneWidget);
+      expect(
+        find.text(
+          'Zorlandığın film veya diziyi cezasız ve sınırsız geçebilirsin.',
+        ),
+        findsOneWidget,
+      );
+      await tap(tester, 'Anladım');
+      expect(c.read(charadesGameProvider).phase, GamePhase.setup);
+      expect(find.text('Sessiz Sinema Nasıl Oynanır?'), findsNothing);
+      tester.view.viewInsets = const FakeViewPadding(bottom: 220);
+      await tester.pumpAndSettle();
+      expect(start, findsNothing);
+      tester.view.resetViewInsets();
+      await tester.pumpAndSettle();
+      expect(start, findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
+  testWidgets('Takım renkleri ve varsayılan seçimler', (tester) async {
+    final c = await open(tester);
+    final blue = tester.widget<Container>(
+      find.byKey(const ValueKey('charades-team-panel-0')),
+    );
+    final red = tester.widget<Container>(
+      find.byKey(const ValueKey('charades-team-panel-1')),
+    );
+    expect(
+      (blue.decoration! as BoxDecoration).color,
+      isNot((red.decoration! as BoxDecoration).color),
+    );
+    for (final seconds in [60, 90, 120]) {
+      await tap(tester, '$seconds');
+    }
+    for (final target in [10, 15, 20, 25, 30]) {
+      await tap(tester, '$target puan');
+    }
+    await tap(tester, '90');
+    await tap(tester, '20 puan');
+    await tap(tester, 'Oyuna Başla');
+    final state = c.read(charadesGameProvider);
+    expect(state.teams.map((t) => t.name), ['Mavi Takım', 'Kırmızı Takım']);
+    expect(state.session!.seconds, 90);
+    expect(state.session!.targetScore, 20);
+  });
   testWidgets('Ayarlar doğrulanır ve düzenlenmiş takım/süre/hedef korunur', (
     tester,
   ) async {
@@ -104,17 +169,19 @@ void main() {
           expect(c.read(charadesGameProvider).remaining.inSeconds, 60);
           await tap(tester, 'Devam Et');
           expect(c.read(charadesGameProvider).card!.id, id);
-          for (var n = 3; n > 0; n--) {
+          for (var n = 0; n < 5; n++) {
             now += const Duration(milliseconds: 400);
-            await tap(tester, 'Pas ($n)');
+            await tap(tester, 'Pas');
+            expect(c.read(charadesGameProvider).passed, n + 1);
+            expect(c.read(charadesGameProvider).teams.first.score, 0);
           }
           expect(
             tester
                 .widget<ElevatedButton>(
-                  find.widgetWithText(ElevatedButton, 'Pas (0)'),
+                  find.widgetWithText(ElevatedButton, 'Pas'),
                 )
                 .onPressed,
-            isNull,
+            isNotNull,
           );
           tester.binding.handleAppLifecycleStateChanged(
             AppLifecycleState.inactive,
@@ -135,7 +202,7 @@ void main() {
         expect(find.text('Tur Bitti!'), findsOneWidget);
         expect(find.text('Skoru Gör'), findsNothing);
         await tap(tester, 'Sonraki Takım');
-        expect(c.read(charadesGameProvider).remainingPasses, 3);
+        expect(c.read(charadesGameProvider).passed, 0);
       }
       await tap(tester, 'Hazırım');
       for (var i = 0; i < 9; i++) {
