@@ -37,16 +37,19 @@ enum PartyGame {
       'Aldığın ipuçlarını birleştirerek kim olduğunu bulmaya çalış.',
     ],
   ),
-  fiveSeconds(
-    title: '5 Saniyede Söyle!',
-    description: 'Süre bitmeden\naklına geleni söyle!',
-    asset: 'five_seconds',
+  undercover(
+    title: 'Aramızdaki Casus',
+    description: 'İpuçlarını dinle,\ncasusu bul!',
+    asset: 'undercover',
     background: Color(0xFFD9F5E8),
     accent: Color(0xFF137E64),
     instructions: [
-      'Sıradaki oyuncu kendisine verilen konuyu dinlesin.',
-      'Oyuncu, konuya uygun üç yanıtı beş saniye içinde söylesin.',
-      'Süre bitince sıra bir sonraki oyuncuya geçsin.',
+      'Her oyuncu gizlice bir kelime görür.',
+      'Bazı oyuncuların kelimesi farklıdır; ancak kimse kendi rolünü bilmez.',
+      'Herkes sırayla kelimesini çağrıştıran tek bir ipucu söyler.',
+      'Oyuncular tartışıp şüphelendikleri kişiye oy verir.',
+      'Casusların tamamı elenirse normal oyuncular kazanır.',
+      'Casus sayısı kalan normal oyuncu sayısına eşit veya daha fazla olursa casuslar kazanır.',
     ],
   ),
   neverHaveIEver(

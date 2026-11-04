@@ -89,6 +89,8 @@ void main() {
       if (game == PartyGame.taboo || game == PartyGame.charades) {
         expect(find.text('Takım İsimleri'), findsOneWidget);
         expect(find.text('Geliştirme aşamasında'), findsNothing);
+      } else if (game == PartyGame.undercover) {
+        expect(find.text('Oyuncu Sayısı'), findsOneWidget);
       } else {
         expect(find.text('Nasıl oynanır?'), findsOneWidget);
         await tester.ensureVisible(find.text('Geliştirme aşamasında'));
@@ -226,14 +228,93 @@ void main() {
     );
     await tapVisible(
       tester,
-      find.byKey(const ValueKey('game-card-five_seconds')),
+      find.byKey(const ValueKey('game-card-undercover')),
     );
     expect(
       container.read(appRouterProvider).state.uri.path,
-      PartyGame.fiveSeconds.path,
+      PartyGame.undercover.path,
     );
     await tester.ensureVisible(find.text('Geliştirme aşamasında'));
     await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('Casus iki listede görünür ve eski oyun görünmez', (
+    tester,
+  ) async {
+    final container = await openApp(tester);
+    for (final path in ['/', '/games']) {
+      container.read(appRouterProvider).go(path);
+      await tester.pumpAndSettle();
+      expect(find.text('Aramızdaki Casus'), findsOneWidget);
+      expect(find.text('5 Saniyede Söyle!'), findsNothing);
+    }
+  });
+
+  testWidgets('Casus oyuncu sınırları, isimler ve kurallar', (tester) async {
+    final container = await openApp(
+      tester,
+      size: const Size(320, 568),
+      textScale: 1.6,
+    );
+    container.read(appRouterProvider).go(PartyGame.undercover.path);
+    await tester.pumpAndSettle();
+    expect(find.text('6 oyuncu'), findsOneWidget);
+    expect(find.text('2 casus aranızda gizleniyor!'), findsOneWidget);
+    final first = find.byKey(const ValueKey('undercover-player-0'));
+    final sixth = find.byKey(const ValueKey('undercover-player-5'));
+    await tester.ensureVisible(sixth);
+    await tester.enterText(sixth, 'Deniz');
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+    final minus = find.widgetWithIcon(IconButton, Icons.remove_rounded);
+    final plus = find.widgetWithIcon(IconButton, Icons.add_rounded);
+    for (var i = 0; i < 3; i++) {
+      await tapVisible(tester, minus);
+    }
+    expect(find.text('3 oyuncu'), findsOneWidget);
+    expect(find.text('1 casus aranızda gizleniyor!'), findsOneWidget);
+    expect(tester.widget<IconButton>(minus).onPressed, isNull);
+    for (var i = 3; i < 20; i++) {
+      await tapVisible(tester, plus);
+      if (i == 5) {
+        expect(tester.widget<TextFormField>(sixth).controller!.text, 'Deniz');
+      }
+      if (i == 8) {
+        expect(find.text('2 casus aranızda gizleniyor!'), findsOneWidget);
+      }
+      if (i == 9) {
+        expect(find.text('3 casus aranızda gizleniyor!'), findsOneWidget);
+      }
+    }
+    expect(find.text('20 oyuncu'), findsOneWidget);
+    expect(tester.widget<IconButton>(plus).onPressed, isNull);
+    await tester.ensureVisible(first);
+    await tester.enterText(first, ' deniz ');
+    tester.view.viewInsets = const FakeViewPadding(bottom: 220);
+    await tester.pumpAndSettle();
+    expect(find.text('Oyuna Başla'), findsNothing);
+    expect(tester.takeException(), isNull);
+    tester.view.resetViewInsets();
+    await tester.pumpAndSettle();
+    await tapVisible(tester, find.text('Oyuna Başla'));
+    expect(find.text('Oyuncu isimleri farklı olmalı.'), findsNWidgets(2));
+    await tester.enterText(first, ' ');
+    await tapVisible(tester, find.text('Oyuna Başla'));
+    expect(find.text('Oyuncu adı boş olamaz.'), findsOneWidget);
+    await tester.enterText(first, 'Ece');
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byTooltip('Oyun kuralları'));
+    expect(find.text('Aramızdaki Casus Nasıl Oynanır?'), findsOneWidget);
+    await tapVisible(tester, find.text('Anladım'));
+    expect(find.text('Kelimemi Gör'), findsNothing);
+    await tapVisible(tester, find.text('Oyuna Başla'));
+    expect(find.text('Kelimemi Gör'), findsOneWidget);
+    expect(find.byType(BottomSheet), findsNothing);
+    expect(
+      container.read(appRouterProvider).state.uri.path,
+      PartyGame.undercover.path,
+    );
     expect(tester.takeException(), isNull);
   });
 }

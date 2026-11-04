@@ -68,7 +68,7 @@ Beş oyunun açıklamaları, renkleri, asset yolları ve temel oynanış açıkl
 - `/games/taboo`: Tabu kurulumu ve beş evreli gerçek oyun akışı.
 - `/games/charades`: Sessiz Sinema kurulumu ve beş evreli oyun akışı.
 - `/games/who_am_i`
-- `/games/five_seconds`
+- `/games/undercover`
 - `/games/never_have_i_ever`
 
 Tanıtım ekranlarında oyun adı, illüstrasyon, kısa açıklama, nasıl oynanır adımları ve geliştirme bilgisi bulunur. Geri butonu önceki ekrana döner; doğrudan açılan tanıtımlarda oyun listesine gider. Geçersiz oyun adresleri oyun listesine yönlenir.
@@ -90,7 +90,7 @@ Tema seçimi Riverpod ile uygulama açıkken korunur. Uygulama yeniden başladı
 1. Tabu
 2. Sessiz Sinema
 3. Ben Kimim?
-4. 5 Saniyede Söyle!
+4. Aramızdaki Casus (ayar ekranı hazır, oynanış geliştirme aşamasında)
 5. Ben Hiç...
 
 ## Kurulum ve doğrulama

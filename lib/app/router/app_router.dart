@@ -1,3 +1,4 @@
+import '../../features/games/undercover/presentation/undercover_setup_screen.dart';
 import '../../features/games/charades/presentation/charades_screen.dart';
 import '../../features/games/tabu/presentation/tabu_screen.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +62,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return switch (game) {
             PartyGame.taboo => const TabuScreen(),
             PartyGame.charades => const CharadesScreen(),
+            PartyGame.undercover => const UndercoverSetupScreen(),
             _ => GameIntroScreen(game: game),
           };
         },

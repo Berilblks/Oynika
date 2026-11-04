@@ -9,11 +9,21 @@ class GameArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ExcludeSemantics(
-    child: Image.asset(
-      game.assetPath,
-      height: height,
-      fit: BoxFit.contain,
-      filterQuality: FilterQuality.medium,
-    ),
+    child:
+        game == PartyGame.undercover
+            ? SizedBox(
+              height: height,
+              child: Icon(
+                Icons.person_search_rounded,
+                size: height * .8,
+                color: game.accent,
+              ),
+            )
+            : Image.asset(
+              game.assetPath,
+              height: height,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.medium,
+            ),
   );
 }
