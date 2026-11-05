@@ -90,7 +90,7 @@ Tema seçimi Riverpod ile uygulama açıkken korunur. Uygulama yeniden başladı
 1. Tabu
 2. Sessiz Sinema
 3. Ben Kimim?
-4. Aramızdaki Casus (ayar ekranı hazır, oynanış geliştirme aşamasında)
+4. Aramızdaki Casus (kelime dağıtımı, ipucu, gizli oylama ve eleme)
 5. Ben Hiç...
 
 ## Kurulum ve doğrulama

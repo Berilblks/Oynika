@@ -2,20 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../app/theme/app_theme.dart';
+import '../application/undercover_controller.dart';
+import 'undercover_visuals.dart';
 
 class UndercoverDistributionScreen extends StatefulWidget {
   const UndercoverDistributionScreen({
     super.key,
     required this.playerName,
+    this.playerIndex = 0,
+    this.playerCount = 6,
     required this.hasSeenWord,
     required this.onReveal,
     required this.onNext,
     required this.onExit,
   });
 
-  final String? playerName;
+  final String playerName;
+  final int playerIndex;
+  final int playerCount;
   final bool hasSeenWord;
-  final String? Function() onReveal;
+  final UndercoverSecret? Function() onReveal;
   final VoidCallback onNext;
   final VoidCallback onExit;
 
@@ -29,7 +35,7 @@ class _UndercoverDistributionScreenState
     with WidgetsBindingObserver {
   bool _armed = false;
   bool _asking = false;
-  String? _visibleWord;
+  UndercoverSecret? _visibleSecret;
 
   @override
   void initState() {
@@ -49,7 +55,7 @@ class _UndercoverDistributionScreenState
   }
 
   void _hide() {
-    if (_visibleWord != null) setState(() => _visibleWord = null);
+    if (_visibleSecret != null) setState(() => _visibleSecret = null);
   }
 
   void _reveal() {
@@ -58,10 +64,10 @@ class _UndercoverDistributionScreenState
         (lifecycle != null && lifecycle != AppLifecycleState.resumed)) {
       return;
     }
-    if (_visibleWord != null) return;
-    final word = widget.onReveal();
-    if (word == null) return;
-    setState(() => _visibleWord = word);
+    if (_visibleSecret != null) return;
+    final secret = widget.onReveal();
+    if (secret == null) return;
+    setState(() => _visibleSecret = secret);
     HapticFeedback.lightImpact();
   }
 
@@ -95,41 +101,25 @@ class _UndercoverDistributionScreenState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final ready = widget.playerName == null;
-    final showCard = _armed && !ready;
-    final action = FilledButton(
-      style: FilledButton.styleFrom(minimumSize: const Size(0, 56)),
+    final showCard = _armed;
+    final action = UndercoverButton(
+      label: _armed ? 'Bilgimi Gördüm' : 'Bilgimi Gör',
       onPressed:
-          ready
-              ? () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('İpucu turu Faz 5.3’te eklenecek.'),
-                ),
-              )
-              : !_armed
+          !_armed
               ? () => setState(() => _armed = true)
-              : widget.hasSeenWord && _visibleWord == null
+              : widget.hasSeenWord && _visibleSecret == null
               ? () {
                 _hide();
                 widget.onNext();
               }
               : null,
-      child: Text(
-        ready
-            ? 'İpucu Turuna Geç'
-            : _armed
-            ? 'Kelimeyi Gördüm'
-            : 'Kelimemi Gör',
-        textAlign: TextAlign.center,
-      ),
     );
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) _exit();
       },
-      child: Scaffold(
+      child: UndercoverScaffold(
         appBar: AppBar(
           leading: IconButton(
             tooltip: 'Geri',
@@ -157,11 +147,9 @@ class _UndercoverDistributionScreenState
             builder:
                 (context, viewport) => SingleChildScrollView(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: ready ? 0 : viewport.maxHeight,
-                    ),
+                    constraints: BoxConstraints(minHeight: viewport.maxHeight),
                     child: Align(
-                      alignment: ready ? Alignment.topCenter : Alignment.center,
+                      alignment: Alignment.center,
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(
                           20,
@@ -175,36 +163,40 @@ class _UndercoverDistributionScreenState
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Icon(
-                                ready
-                                    ? Icons.groups_rounded
-                                    : Icons.person_search_rounded,
-                                color: colors.primary,
-                                size: 42,
-                              ),
-                              const SizedBox(height: 16),
                               Text(
-                                ready
-                                    ? 'Herkes Hazır mı?'
-                                    : 'Telefonu bu oyuncuya ver',
+                                '${widget.playerIndex + 1}. Oyuncu',
                                 textAlign: TextAlign.center,
-                                style: theme.textTheme.headlineMedium,
+                                style: theme.textTheme.titleLarge,
                               ),
                               const SizedBox(height: 12),
-                              if (!ready)
-                                Text(
-                                  widget.playerName!,
-                                  textAlign: TextAlign.center,
-                                  style: theme.textTheme.titleLarge,
-                                ),
-                              const SizedBox(height: 8),
-                              Text(
-                                ready
-                                    ? 'Artık sırayla kelimenizi çağrıştıran tek bir ipucu söyleyin. Kelimenizi doğrudan söylemeyin!'
-                                    : 'Kelimen yalnızca sana gösterilecek. Diğer oyuncuların görmediğinden emin ol.',
-                                textAlign: TextAlign.center,
-                                style: theme.textTheme.bodyLarge,
+                              UndercoverProgress(
+                                index: widget.playerIndex,
+                                count: widget.playerCount,
                               ),
+                              const SizedBox(height: 16),
+                              UndercoverArt(size: showCard ? 100 : 136),
+                              const SizedBox(height: 16),
+                              if (!showCard) ...[
+                                Text(
+                                  'Telefonu bu oyuncuya ver',
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.headlineMedium,
+                                ),
+                                const SizedBox(height: 12),
+                              ],
+                              Text(
+                                widget.playerName,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.titleLarge,
+                              ),
+                              if (!showCard) ...[
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Gizli bilgin yalnızca sana gösterilecek. Diğer oyuncuların görmediğinden emin ol.',
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.bodyLarge,
+                                ),
+                              ],
                               const SizedBox(height: 28),
                               if (showCard) ...[
                                 Listener(
@@ -216,11 +208,23 @@ class _UndercoverDistributionScreenState
                                     onLongPressStart: (_) => _reveal(),
                                     onLongPressEnd: (_) => _hide(),
                                     onLongPressCancel: _hide,
-                                    child: _SecretWordCard(word: _visibleWord),
+                                    child: _SecretWordCard(
+                                      secret: _visibleSecret,
+                                    ),
                                   ),
                                 ),
                               ],
 
+                              if (showCard) ...[
+                                const SizedBox(height: 20),
+                                const UndercoverPanel(
+                                  padding: EdgeInsets.all(16),
+                                  child: Text(
+                                    'Bilgini gördükten sonra “Bilgimi Gördüm” butonuna bas ve telefonu sıradaki oyuncuya ver.',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
                               if (!showCard) action,
                             ],
                           ),
@@ -237,15 +241,16 @@ class _UndercoverDistributionScreenState
 }
 
 class _SecretWordCard extends StatelessWidget {
-  const _SecretWordCard({required this.word});
+  const _SecretWordCard({required this.secret});
 
-  final String? word;
+  final UndercoverSecret? secret;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final active = word != null;
+    final active = secret != null;
+    final spy = secret?.role == UndercoverRole.spy;
     final foreground = active ? Colors.white : colors.onPrimaryContainer;
     final duration =
         MediaQuery.disableAnimationsOf(context)
@@ -264,7 +269,18 @@ class _SecretWordCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: active ? AppTheme.primary : colors.primaryContainer,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(
+            color: colors.primary.withValues(alpha: .30),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: colors.primary.withValues(alpha: .10),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
         // Only the surface animates. The secret text is replaced immediately.
         child: Column(
@@ -274,11 +290,20 @@ class _SecretWordCard extends StatelessWidget {
             Icon(
               active ? Icons.visibility_outlined : Icons.fingerprint_rounded,
               color: foreground,
-              size: 24,
+              size: active ? 24 : 44,
             ),
             const SizedBox(height: 10),
+            if (active && !spy) ...[
+              Text(
+                'KELİMEN',
+                style: theme.textTheme.labelLarge?.copyWith(color: foreground),
+              ),
+              const SizedBox(height: 6),
+            ],
             Text(
-              word ?? 'Kelimeyi görmek için basılı tut',
+              spy
+                  ? 'SEN CASUSSUN!'
+                  : secret?.word ?? 'Bilgini görmek için basılı tut',
               textAlign: TextAlign.center,
               style: (active
                       ? theme.textTheme.headlineMedium
@@ -291,7 +316,9 @@ class _SecretWordCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               active
-                  ? 'Parmağını kaldırınca gizlenecek'
+                  ? spy
+                      ? 'Diğer oyuncuların ipuçlarını dinle ve kelimeyi öğrenmeye çalış.'
+                      : 'Parmağını kaldırınca gizlenecek'
                   : 'Yalnızca sen görebilirsin',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(color: foreground),

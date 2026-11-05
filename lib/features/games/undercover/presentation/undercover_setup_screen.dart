@@ -7,11 +7,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../charades/presentation/charades_setup_widgets.dart';
-import '../../tabu/presentation/tabu_widgets.dart';
+import 'undercover_visuals.dart';
 import '../../domain/party_game.dart';
 import '../application/undercover_controller.dart';
 import 'undercover_distribution_screen.dart';
+import 'undercover_round_screen.dart';
+import 'undercover_results_screen.dart';
 import '../../tabu/domain/tabu_models.dart';
 
 class UndercoverSetupScreen extends ConsumerStatefulWidget {
@@ -34,18 +35,32 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
 
   static const _privacyChannel = MethodChannel('oynika/undercover_privacy');
   bool _starting = false;
+  UndercoverSession? _viewingResults;
   bool _secure = false;
+  Future<void> _privacyRelease = Future.value();
 
   int get _spies => spyCountFor(_count);
 
-  Future<void> _releasePrivacy() async {
-    if (!_secure) return;
+  Future<void> _enablePrivacy() async {
+    await _privacyRelease;
+    if (!kIsWeb && Platform.isAndroid && !_secure) {
+      await _privacyChannel.invokeMethod<void>('setSecure', true);
+      _secure = true;
+    }
+  }
+
+  Future<void> _releasePrivacy() {
+    if (!_secure) return _privacyRelease;
     _secure = false;
+    return _privacyRelease = _clearSecureFrame();
+  }
+
+  Future<void> _clearSecureFrame() async {
     await WidgetsBinding.instance.endOfFrame;
     try {
       await _privacyChannel.invokeMethod<void>('setSecure', false);
     } on PlatformException {
-      // Leaving the window protected is safer than revealing a stale frame.
+      // Keep the native window protected if clearing the flag fails.
     }
   }
 
@@ -74,17 +89,26 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
     final names = [
       for (var index = 0; index < _count; index++) _names[index].text,
     ];
+    await _launchGame(() {
+      ref.read(undercoverSessionProvider.notifier).start(names);
+      return true;
+    });
+  }
+
+  Future<void> _launchGame(bool Function() launch) async {
+    if (_starting) return;
     setState(() => _starting = true);
     try {
-      if (!kIsWeb && Platform.isAndroid) {
-        await _privacyChannel.invokeMethod<void>('setSecure', true);
-        _secure = true;
-      }
+      await _enablePrivacy();
       if (!mounted) {
         await _releasePrivacy();
         return;
       }
-      ref.read(undercoverSessionProvider.notifier).start(names);
+      if (launch()) {
+        _viewingResults = null;
+      } else {
+        await _releasePrivacy();
+      }
     } on PlatformException {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -241,13 +265,57 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
     if (session != null) {
       final player = session.current;
       final controller = ref.read(undercoverSessionProvider.notifier);
+      if (identical(_viewingResults, session) &&
+          session.phase == UndercoverPhase.finished) {
+        return UndercoverResultsScreen(
+          session: session,
+          busy: _starting,
+          onBack: () => setState(() => _viewingResults = null),
+          onReplay:
+              () =>
+                  _launchGame(() => controller.restartWithSamePlayers(session)),
+          onHome: () {
+            _viewingResults = null;
+            controller.exit();
+            context.go('/');
+          },
+        );
+      }
+      final round = session.round;
+      if (round != null) {
+        return UndercoverRoundScreen(
+          key: ValueKey(round),
+          round: round,
+          names: {for (final player in session.players) player.id: player.name},
+          activeCount: session.activeIds.length,
+          eliminatedRole:
+              round.eliminatedId == null
+                  ? null
+                  : session.players[round.eliminatedId!].role,
+          onBeginVoting: () => controller.beginVoting(round),
+          onVote:
+              (candidate) => controller.vote(round, round.voter!, candidate),
+          onTie: () => controller.continueTie(round),
+          onElimination: () => controller.continueElimination(round),
+          onResults: () {
+            if (identical(ref.read(undercoverSessionProvider), session) &&
+                session.phase == UndercoverPhase.finished) {
+              setState(() => _viewingResults = session);
+            }
+          },
+          enablePrivacy: _enablePrivacy,
+          releasePrivacy: _releasePrivacy,
+          onExit: controller.exit,
+        );
+      }
       return UndercoverDistributionScreen(
         key: ValueKey(session.index),
-        playerName: player?.name,
+        playerName: player!.name,
+        playerIndex: session.index,
+        playerCount: session.players.length,
         hasSeenWord: session.currentHasSeenWord,
-        onReveal: () => player == null ? null : controller.reveal(player.id),
+        onReveal: () => controller.reveal(player.id),
         onNext: () {
-          if (player == null) return;
           controller.next(player.id);
           if (session.index + 1 == session.players.length) {
             unawaited(_releasePrivacy());
@@ -260,7 +328,7 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
       );
     }
     final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
-    return Scaffold(
+    return UndercoverScaffold(
       appBar: AppBar(
         leading: IconButton(
           tooltip: 'Geri',
@@ -280,7 +348,7 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
           keyboardOpen
               ? null
               : Material(
-                color: colors.surface,
+                color: Colors.transparent,
                 child: SafeArea(
                   top: false,
                   minimum: const EdgeInsets.fromLTRB(20, 12, 20, 12),
@@ -288,141 +356,113 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
                     heightFactor: 1,
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 480),
-                      child: CharadesStartButton(
+                      child: UndercoverButton(
+                        label: 'Oyunu Başlat',
+                        icon: Icons.play_arrow_rounded,
                         onPressed: _starting ? null : _start,
                       ),
                     ),
                   ),
                 ),
               ),
-      body: CustomPaint(
-        painter:
-            theme.brightness == Brightness.light
-                ? TabuBackgroundPainter(dark: false, playing: false)
-                : null,
-        child: SafeArea(
-          top: false,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 480),
-                child: Form(
-                  key: _form,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Center(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: colors.tertiaryContainer,
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Icon(
-                              Icons.person_search_rounded,
-                              color: colors.onTertiaryContainer,
-                              size: 34,
+      body: SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Form(
+                key: _form,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Aramızdaki Casus',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineLarge?.copyWith(
+                        color: colors.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const UndercoverArt(size: 150),
+                    const SizedBox(height: 16),
+                    UndercoverPanel(
+                      child: Text(
+                        'İpuçlarını dinle, casusları bul! Ama dikkat et, casuslar da seninle birlikte oynuyor.',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          height: 1.45,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    Text('Oyuncu Sayısı', style: theme.textTheme.titleMedium),
+                    const SizedBox(height: 12),
+                    Card(
+                      color: colors.surfaceContainerLow,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        side: BorderSide(
+                          color: colors.outlineVariant.withValues(alpha: .45),
+                        ),
+                      ),
+                      margin: EdgeInsets.zero,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        child: Row(
+                          children: [
+                            IconButton.filledTonal(
+                              tooltip: 'Oyuncu azalt',
+                              onPressed:
+                                  _count == _minPlayers
+                                      ? null
+                                      : () {
+                                        FocusScope.of(context).unfocus();
+                                        setState(() => _count--);
+                                      },
+                              icon: const Icon(Icons.remove_rounded),
                             ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Aramızdaki Casus',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.headlineLarge?.copyWith(
-                          fontSize: 32,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Kelimen farklı mı? Kimseye belli etme!',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontSize: 15,
-                          height: 1.35,
-                          color: colors.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Geliştirme aşamasında',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodySmall,
-                      ),
-                      const SizedBox(height: 28),
-                      Text('Oyuncu Sayısı', style: theme.textTheme.titleMedium),
-                      const SizedBox(height: 12),
-                      Card(
-                        color: colors.surfaceContainerLow,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          side: BorderSide(
-                            color: colors.outlineVariant.withValues(alpha: .45),
-                          ),
-                        ),
-                        margin: EdgeInsets.zero,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          child: Row(
-                            children: [
-                              IconButton.filledTonal(
-                                tooltip: 'Oyuncu azalt',
-                                onPressed:
-                                    _count == _minPlayers
-                                        ? null
-                                        : () {
-                                          FocusScope.of(context).unfocus();
-                                          setState(() => _count--);
-                                        },
-                                icon: const Icon(Icons.remove_rounded),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  '$_count oyuncu',
-                                  textAlign: TextAlign.center,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    color: colors.onSurface,
-                                  ),
+                            Expanded(
+                              child: Text(
+                                '$_count oyuncu',
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: colors.onSurface,
                                 ),
                               ),
-                              IconButton.filledTonal(
-                                tooltip: 'Oyuncu artır',
-                                onPressed:
-                                    _count == _maxPlayers
-                                        ? null
-                                        : () {
-                                          FocusScope.of(context).unfocus();
-                                          setState(() => _count++);
-                                        },
-                                icon: const Icon(Icons.add_rounded),
-                              ),
-                            ],
-                          ),
+                            ),
+                            IconButton.filledTonal(
+                              tooltip: 'Oyuncu artır',
+                              onPressed:
+                                  _count == _maxPlayers
+                                      ? null
+                                      : () {
+                                        FocusScope.of(context).unfocus();
+                                        setState(() => _count++);
+                                      },
+                              icon: const Icon(Icons.add_rounded),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        '$_spies casus aranızda gizleniyor!',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.titleSmall,
-                      ),
-                      const SizedBox(height: 28),
-                      Text(
-                        'Oyuncu İsimleri',
-                        style: theme.textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: 12),
-                      for (var index = 0; index < _count; index++)
-                        _playerField(context, index),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '$_spies casus aranızda gizleniyor!',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.titleSmall,
+                    ),
+                    const SizedBox(height: 28),
+                    Text('Oyuncu İsimleri', style: theme.textTheme.titleMedium),
+                    const SizedBox(height: 12),
+                    for (var index = 0; index < _count; index++)
+                      _playerField(context, index),
+                  ],
                 ),
               ),
             ),

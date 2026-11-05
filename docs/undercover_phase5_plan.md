@@ -7,7 +7,8 @@
 - Her elemeden sonra kazanma koşullarını kontrol et. Tüm casuslar elendiyse normal oyuncular kazanır. Kalan casus sayısı kalan normal oyuncu sayısına eşit veya daha fazlaysa casuslar kazanır.
 - Oyun devam ediyorsa kalan oyuncularla yeni ipucu turunu başlat. Elenen oyuncuları sonraki ipucu turlarına ve oylamalara dahil etme.
 
-## Faz 5.4 — Kazanan Ekranı
+## Faz 5.4 — Oyun Sonuçları
 
-- Kazanma koşulu sağlandığında kazanan tarafı göster.
-- Her iki gizli kelimeyi yalnızca oyun sona erdiğinde, kazanan ekranında açıkla.
+- Birleşik eleme ve kazanan ekranından tamamlanan oyunun detaylarına geç.
+- Sonuçlarda tek gizli kelimeyi, bütün casusları ve oyuncuların elenme sırasını göster.
+- Tekrar Oyna ile aynı oyunculara yeni kelime ve roller dağıt. Ana Menü ile oturumu kapat.

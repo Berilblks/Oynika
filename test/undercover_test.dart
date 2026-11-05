@@ -15,23 +15,16 @@ ProviderContainer testContainer(int seed) => ProviderContainer(
 List<String> names(int count) => List.generate(count, (i) => 'Oyuncu ${i + 1}');
 
 void main() {
-  test('250 farklı çift, 500 farklı doğal Unicode sözcük veya ifade', () {
-    expect(undercoverPairs, hasLength(250));
-    final words = <String>{};
-    final pairs = <String>{};
-    final allowed = RegExp(
-      r'^[a-zA-ZçğıöşüÇĞİÖŞÜâîûÂÎÛ]+(?: [a-zA-ZçğıöşüÇĞİÖŞÜâîûÂÎÛ]+)*$',
-    );
-    for (final pair in undercoverPairs) {
-      final canonical = [turkishKey(pair.first), turkishKey(pair.second)]
-        ..sort();
-      expect(pairs.add(canonical.join('|')), isTrue);
-      for (final word in [pair.first, pair.second]) {
-        expect(word, matches(allowed));
-        expect(words.add(turkishKey(word)), isTrue);
-      }
+  test('Çevrimdışı havuz en az 250 benzersiz Türkçe kelime içerir', () {
+    expect(undercoverWords.length, greaterThanOrEqualTo(250));
+    final allowed = RegExp(r'^[a-zA-ZçğıöşüÇĞİÖŞÜâîûÂÎÛ]+$');
+    for (final word in undercoverWords) {
+      expect(word, matches(allowed));
     }
-    expect(words, hasLength(500));
+    expect(
+      undercoverWords.map(turkishKey).toSet(),
+      hasLength(undercoverWords.length),
+    );
   });
 
   test('Oyuncu sırası korunur ve her eşikte doğru roller atanır', () {
@@ -51,17 +44,17 @@ void main() {
       expect(session.players.map((p) => p.name), names(count));
       expect(session.players.map((p) => p.id).toSet(), hasLength(count));
       final spies = session.players.where((p) => p.role == UndercoverRole.spy);
-      final normals = session.players.where(
-        (p) => p.role == UndercoverRole.normal,
-      );
       expect(spies, hasLength(expected));
-      expect(spies.map((p) => p.word).toSet(), hasLength(1));
-      expect(normals.map((p) => p.word).toSet(), hasLength(1));
-      expect(spies.first.word, isNot(normals.first.word));
-      expect([
-        spies.first.word,
-        normals.first.word,
-      ], unorderedEquals([session.pair.first, session.pair.second]));
+      for (final player in session.players) {
+        expect(controller.reveal((player.id + 1) % count), isNull);
+        final secret = controller.reveal(player.id);
+        expect(secret?.role, player.role);
+        expect(
+          secret?.word,
+          player.role == UndercoverRole.normal ? session.secretWord : null,
+        );
+        controller.next(player.id);
+      }
     }
   });
 
@@ -72,31 +65,317 @@ void main() {
     addTearDown(b.dispose);
     final ac = a.read(undercoverSessionProvider.notifier);
     final bc = b.read(undercoverSessionProvider.notifier);
-    final pairs = <WordPair>{};
+    final drawnWords = <String>{};
     final assignments = <String>{};
-    final orientations = <bool>{};
-    for (var i = 0; i < 250; i++) {
+    for (var i = 0; i < undercoverWords.length; i++) {
       ac.start(names(6));
       bc.start(names(6));
       final session = a.read(undercoverSessionProvider)!;
       expect(session.players, b.read(undercoverSessionProvider)!.players);
-      expect(pairs.add(session.pair), isTrue);
+      expect(drawnWords.add(session.secretWord), isTrue);
       final spies = session.players.where((p) => p.role == UndercoverRole.spy);
       assignments.add(spies.map((p) => p.id).join(','));
-      orientations.add(spies.first.word == session.pair.first);
     }
     expect(assignments.length, greaterThan(1));
-    expect(orientations, {true, false});
-    final last = a.read(undercoverSessionProvider)!.pair;
-    final nextCycle = <WordPair>{};
-    for (var i = 0; i < 250; i++) {
+    final last = a.read(undercoverSessionProvider)!.secretWord;
+    final nextCycle = <String>{};
+    for (var i = 0; i < undercoverWords.length; i++) {
       ac.start(names(6));
-      final pair = a.read(undercoverSessionProvider)!.pair;
-      if (i == 0) expect(pair, isNot(last));
-      expect(nextCycle.add(pair), isTrue);
+      final word = a.read(undercoverSessionProvider)!.secretWord;
+      if (i == 0) expect(word, isNot(last));
+      expect(nextCycle.add(word), isTrue);
     }
-    expect(nextCycle, pairs);
+    expect(nextCycle, drawnWords);
   });
+
+  UndercoverController startRound(ProviderContainer container, int count) {
+    final controller = container.read(undercoverSessionProvider.notifier);
+    controller.start(names(count));
+    for (var id = 0; id < count; id++) {
+      controller.reveal(id);
+      controller.next(id);
+    }
+    return controller;
+  }
+
+  UndercoverSession session(ProviderContainer container) =>
+      container.read(undercoverSessionProvider)!;
+
+  void beginVotes(
+    ProviderContainer container,
+    UndercoverController controller,
+  ) {
+    expect(session(container).phase, UndercoverPhase.clue);
+    controller.beginVoting(session(container).round!);
+  }
+
+  void voteFor(
+    ProviderContainer container,
+    UndercoverController controller,
+    int Function(UndercoverRound, int) choose,
+  ) {
+    while (session(container).phase == UndercoverPhase.voting) {
+      final round = session(container).round!;
+      final voter = round.voter!;
+      expect(voter, session(container).activeIds[round.votes.length]);
+      controller.vote(round, voter, voter);
+      expect(session(container).round, same(round));
+      final target = choose(round, voter);
+      controller.vote(round, voter, target);
+      final after = session(container).round!;
+      controller.vote(round, voter, target);
+      expect(session(container).round, same(after));
+    }
+    expect(
+      session(container).round!.phase,
+      isIn([UndercoverPhase.tie, UndercoverPhase.elimination]),
+    );
+  }
+
+  test(
+    'Beraberlikte bir kez yeniden oylanır ve ikinci eşitlikte eleme olmaz',
+    () {
+      final container = testContainer(17);
+      addTearDown(container.dispose);
+      final controller = startRound(container, 6);
+      beginVotes(container, controller);
+      const targets = {0: 1, 1: 0, 2: 0, 3: 1, 4: 0, 5: 1};
+      voteFor(container, controller, (_, voter) => targets[voter]!);
+      final first = session(container).round!;
+      expect(first.leaders, unorderedEquals([0, 1]));
+      controller.continueTie(first);
+      final runoff = session(container).round!;
+      expect(runoff.votes, isEmpty);
+      expect(runoff.runoffCandidates, unorderedEquals([0, 1]));
+      voteFor(container, controller, (round, voter) {
+        expect(
+          round.candidates,
+          unorderedEquals([0, 1].where((id) => id != voter)),
+        );
+        return targets[voter]!;
+      });
+      controller.continueTie(session(container).round!);
+      expect(session(container).eliminatedIds, isEmpty);
+      expect(session(container).round!.number, 2);
+      expect(session(container).round!.order.first, first.order[0]);
+    },
+  );
+
+  test(
+    'Beraberlik bozulur ve elenen oyuncu sonraki ipucu ve oylamadan çıkar',
+    () {
+      final container = testContainer(17);
+      addTearDown(container.dispose);
+      final controller = startRound(container, 4);
+      final original = session(container);
+      final normal =
+          original.players
+              .firstWhere((p) => p.role == UndercoverRole.normal)
+              .id;
+      final other = original.activeIds.firstWhere((id) => id != normal);
+      final rest =
+          original.activeIds
+              .where((id) => id != normal && id != other)
+              .toList();
+      beginVotes(container, controller);
+      voteFor(
+        container,
+        controller,
+        (_, voter) => voter == normal || voter == rest[0] ? other : normal,
+      );
+      controller.continueTie(session(container).round!);
+      voteFor(
+        container,
+        controller,
+        (_, voter) => voter == normal ? other : normal,
+      );
+      expect(session(container).eliminatedIds, {normal});
+      expect(session(container).round!.eliminatedId, normal);
+      expect(session(container).round!.winner, isNull);
+      controller.continueElimination(session(container).round!);
+      expect(session(container).round!.order, isNot(contains(normal)));
+      expect(session(container).players, same(original.players));
+      expect(session(container).secretWord, original.secretWord);
+      beginVotes(container, controller);
+      final round = session(container).round!;
+      controller.vote(round, normal, round.candidates.first);
+      controller.vote(round, round.voter!, normal);
+      expect(session(container).round, same(round));
+    },
+  );
+
+  for (final loser in UndercoverRole.values) {
+    test('Kazanan hemen belirlenir ve yeni oy kabul edilmez: $loser', () {
+      final container = testContainer(2);
+      addTearDown(container.dispose);
+      final controller = startRound(container, 3);
+      final eliminated =
+          session(container).players.firstWhere((p) => p.role == loser).id;
+      beginVotes(container, controller);
+      voteFor(
+        container,
+        controller,
+        (round, voter) =>
+            voter == eliminated ? round.candidates.first : eliminated,
+      );
+      expect(session(container).phase, UndercoverPhase.finished);
+      final result = session(container).round!;
+      expect(result.phase, UndercoverPhase.elimination);
+      expect(
+        result.winner,
+        loser == UndercoverRole.spy
+            ? UndercoverRole.normal
+            : UndercoverRole.spy,
+      );
+      controller.vote(result, 0, 1);
+      expect(session(container).round, same(result));
+      controller.continueElimination(result);
+      expect(session(container).round, same(result));
+    });
+  }
+
+  testWidgets('Gizli oy onaylanmadan kaydedilmez ve sonraki oyuncuya sızmaz', (
+    tester,
+  ) async {
+    final container = testContainer(10);
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(home: UndercoverSetupScreen()),
+      ),
+    );
+    final controller = startRound(container, 3);
+    await tester.pumpAndSettle();
+    Future<void> tap(String label) async {
+      await tester.ensureVisible(find.text(label));
+      await tester.tap(find.text(label));
+      await tester.pumpAndSettle();
+    }
+
+    expect(find.text('Herkes sırayla bir ipucu versin!'), findsOneWidget);
+    expect(find.text('İpucumu Söyledim'), findsNothing);
+    await tap('Oylamaya Geç');
+    final eliminated = session(
+      container,
+    ).players.firstWhere((p) => p.role == UndercoverRole.spy);
+    for (var i = 0; i < 3; i++) {
+      final round = session(container).round!;
+      final voter = round.voter!;
+      expect(find.text('${i + 1}. Oyuncu: ${names(3)[i]}'), findsOneWidget);
+      await tap('Oy Vermeye Başla');
+      expect(find.text(names(3)[voter]), findsNothing);
+      final confirm = find.widgetWithText(FilledButton, 'Oyumu Onayla');
+      expect(tester.widget<FilledButton>(confirm).onPressed, isNull);
+      final target =
+          voter == eliminated.id ? round.candidates.first : eliminated.id;
+      await tap(names(3)[target]);
+      expect(session(container).round!.votes.length, i);
+      if (i == 0) {
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.inactive,
+        );
+        await tester.pumpAndSettle();
+        expect(confirm, findsNothing);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await tester.pumpAndSettle();
+        await tap('Oy Vermeye Başla');
+        expect(tester.widget<FilledButton>(confirm).onPressed, isNull);
+        await tap(names(3)[target]);
+      }
+      await tap('Oyumu Onayla');
+      expect(confirm, findsNothing);
+      expect(find.text('Oylama Tamamlandı!'), findsNothing);
+    }
+    expect(find.text('${eliminated.name} Elendi!'), findsOneWidget);
+    expect(find.text('CASUSTU!'), findsOneWidget);
+    expect(find.text(session(container).secretWord), findsNothing);
+    expect(find.text('SEN CASUSSUN!'), findsNothing);
+    expect(find.text('NORMAL OYUNCULAR KAZANDI!'), findsOneWidget);
+    await tap('Oyun Sonuçları');
+    final completed = session(container);
+    expect(
+      find.byKey(const ValueKey('undercover-result-word')),
+      findsOneWidget,
+    );
+    expect(find.text('Casuslar Kimdi?'), findsOneWidget);
+    expect(
+      find.byKey(ValueKey('undercover-result-spy-${eliminated.id}')),
+      findsOneWidget,
+    );
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('${eliminated.name} Elendi!'), findsOneWidget);
+    expect(session(container), same(completed));
+    await tap('Oyun Sonuçları');
+    await tester.tap(find.text('Tekrar Oyna'));
+    await tester.tap(find.text('Tekrar Oyna'));
+    await tester.pumpAndSettle();
+    expect(session(container).secretWord, isNot(completed.secretWord));
+    expect(
+      session(container).players.map((p) => p.name),
+      completed.players.map((p) => p.name),
+    );
+    expect(session(container).eliminationOrder, isEmpty);
+    expect(session(container).round, isNull);
+    expect(session(container).index, 0);
+    expect(find.text('Bilgimi Gör'), findsOneWidget);
+    expect(find.byKey(const ValueKey('undercover-result-word')), findsNothing);
+    expect(tester.takeException(), isNull);
+    controller.exit();
+  });
+
+  for (final loser in UndercoverRole.values) {
+    test(
+      'Sonuçlar eleme sırasını tutar ve tekrar oyun tek kez başlar: $loser',
+      () {
+        final container = testContainer(31);
+        addTearDown(container.dispose);
+        final controller = startRound(container, 6);
+        final eliminated = <int>[];
+        final original = session(container);
+        expect(controller.restartWithSamePlayers(original), isFalse);
+        while (session(container).phase != UndercoverPhase.finished) {
+          final target =
+              session(container).players
+                  .firstWhere(
+                    (p) =>
+                        p.role == loser &&
+                        !session(container).eliminatedIds.contains(p.id),
+                  )
+                  .id;
+          eliminated.add(target);
+          beginVotes(container, controller);
+          voteFor(
+            container,
+            controller,
+            (round, voter) => voter == target ? round.candidates.first : target,
+          );
+          if (session(container).phase != UndercoverPhase.finished) {
+            controller.continueElimination(session(container).round!);
+          }
+        }
+        final completed = session(container);
+        expect(completed.eliminationOrder, eliminated);
+        expect(completed.players, same(original.players));
+        expect(controller.restartWithSamePlayers(completed), isTrue);
+        final fresh = session(container);
+        expect(controller.restartWithSamePlayers(completed), isFalse);
+        expect(session(container), same(fresh));
+        expect(
+          fresh.players.map((p) => p.name),
+          original.players.map((p) => p.name),
+        );
+        expect(fresh.secretWord, isNot(completed.secretWord));
+        expect(fresh.eliminationOrder, isEmpty);
+        expect(fresh.round, isNull);
+        expect(fresh.index, 0);
+        expect(fresh.phase, UndercoverPhase.wordDistribution);
+      },
+    );
+  }
 
   for (final brightness in Brightness.values) {
     testWidgets('Gizli dağıtım, geri ve yaşam döngüsü: $brightness', (
@@ -127,7 +406,7 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      await tap('Oyuna Başla');
+      await tap('Oyunu Başlat');
       final players = container.read(undercoverSessionProvider)!.players;
       final hold = find.byKey(const ValueKey('undercover-hold'));
       final surface = find.descendant(
@@ -138,11 +417,15 @@ void main() {
           (tester.widget<AnimatedContainer>(surface).decoration
                   as BoxDecoration)
               .color;
+      final word = session(container).secretWord;
       for (final player in players) {
+        final spy = player.role == UndercoverRole.spy;
+        final visible = spy ? 'SEN CASUSSUN!' : word;
         expect(find.text(player.name), findsOneWidget);
-        expect(find.text(player.word), findsNothing);
-        await tap('Kelimemi Gör');
-        final seen = find.widgetWithText(FilledButton, 'Kelimeyi Gördüm');
+        expect(find.text(word), findsNothing);
+        expect(find.text('SEN CASUSSUN!'), findsNothing);
+        await tap('Bilgimi Gör');
+        final seen = find.widgetWithText(FilledButton, 'Bilgimi Gördüm');
         expect(tester.widget<FilledButton>(seen).onPressed, isNull);
         expect(find.byIcon(Icons.fingerprint_rounded), findsOneWidget);
         expect(find.text('Yalnızca sen görebilirsin'), findsOneWidget);
@@ -155,7 +438,9 @@ void main() {
         await tester.pumpAndSettle();
         final gesture = await tester.startGesture(tester.getCenter(hold));
         await tester.pump(const Duration(milliseconds: 600));
-        expect(find.text(player.word), findsOneWidget);
+        expect(find.text(visible), findsOneWidget);
+        expect(find.text(spy ? word : 'SEN CASUSSUN!'), findsNothing);
+        expect(find.text('KELİMEN'), spy ? findsNothing : findsOneWidget);
         expect(cardColor(), AppTheme.primary);
         expect(cardColor(), isNot(restingColor));
         expect(find.byIcon(Icons.visibility_outlined), findsOneWidget);
@@ -168,12 +453,14 @@ void main() {
             AppLifecycleState.inactive,
           );
           await tester.pump();
-          expect(find.text(player.word), findsNothing);
+          expect(find.text(word), findsNothing);
+          expect(find.text('SEN CASUSSUN!'), findsNothing);
           tester.binding.handleAppLifecycleStateChanged(
             AppLifecycleState.resumed,
           );
           await tester.pump();
-          expect(find.text(player.word), findsNothing);
+          expect(find.text(word), findsNothing);
+          expect(find.text('SEN CASUSSUN!'), findsNothing);
         }
         if (player.id == 1) {
           await gesture.cancel();
@@ -181,30 +468,33 @@ void main() {
           await gesture.up();
         }
         await tester.pump();
-        expect(find.text(player.word), findsNothing);
+        expect(find.text(word), findsNothing);
+        expect(find.text('SEN CASUSSUN!'), findsNothing);
         expect(cardColor(), restingColor);
         await tester.pumpAndSettle();
-        expect(find.text(player.word), findsNothing);
-        await tap('Kelimeyi Gördüm');
+        expect(find.text(word), findsNothing);
+        expect(find.text('SEN CASUSSUN!'), findsNothing);
+        await tap('Bilgimi Gördüm');
         if (player.id == 0) {
           await tester.binding.handlePopRoute();
           await tester.pumpAndSettle();
           expect(find.text('Oyundan çıkmak istiyor musun?'), findsOneWidget);
-          expect(find.text(player.word), findsNothing);
+          expect(find.text(word), findsNothing);
+          expect(find.text('SEN CASUSSUN!'), findsNothing);
           await tap('Oyunda Kal');
           expect(find.text(players[1].name), findsOneWidget);
         }
       }
-      expect(find.text('Herkes Hazır mı?'), findsOneWidget);
+      expect(find.text('Herkes sırayla bir ipucu versin!'), findsOneWidget);
+      expect(find.text('Herkes Hazır mı?'), findsNothing);
       expect(
         container.read(undercoverSessionProvider)!.seenPlayerIds,
         hasLength(6),
       );
-      for (final player in players) {
-        expect(find.text(player.word), findsNothing);
-      }
-      await tap('İpucu Turuna Geç');
-      expect(find.text('İpucu turu Faz 5.3’te eklenecek.'), findsOneWidget);
+      expect(find.text(word), findsNothing);
+      expect(find.text('SEN CASUSSUN!'), findsNothing);
+      expect(find.text('İpucumu Söyledim'), findsNothing);
+      expect(find.text('Oylamaya Geç'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }

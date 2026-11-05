@@ -1,3 +1,4 @@
+import 'package:oynika/features/games/undercover/application/undercover_controller.dart';
 import 'package:oynika/features/games/charades/data/charades_repository.dart';
 import 'package:oynika/features/games/tabu/data/card_repository.dart';
 import 'package:flutter/material.dart';
@@ -234,7 +235,7 @@ void main() {
       container.read(appRouterProvider).state.uri.path,
       PartyGame.undercover.path,
     );
-    await tester.ensureVisible(find.text('Geliştirme aşamasında'));
+    await tester.ensureVisible(find.text('Oyuncu İsimleri'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
@@ -292,14 +293,14 @@ void main() {
     await tester.enterText(first, ' deniz ');
     tester.view.viewInsets = const FakeViewPadding(bottom: 220);
     await tester.pumpAndSettle();
-    expect(find.text('Oyuna Başla'), findsNothing);
+    expect(find.text('Oyunu Başlat'), findsNothing);
     expect(tester.takeException(), isNull);
     tester.view.resetViewInsets();
     await tester.pumpAndSettle();
-    await tapVisible(tester, find.text('Oyuna Başla'));
+    await tapVisible(tester, find.text('Oyunu Başlat'));
     expect(find.text('Oyuncu isimleri farklı olmalı.'), findsNWidgets(2));
     await tester.enterText(first, ' ');
-    await tapVisible(tester, find.text('Oyuna Başla'));
+    await tapVisible(tester, find.text('Oyunu Başlat'));
     expect(find.text('Oyuncu adı boş olamaz.'), findsOneWidget);
     await tester.enterText(first, 'Ece');
     FocusManager.instance.primaryFocus?.unfocus();
@@ -307,9 +308,9 @@ void main() {
     await tapVisible(tester, find.byTooltip('Oyun kuralları'));
     expect(find.text('Aramızdaki Casus Nasıl Oynanır?'), findsOneWidget);
     await tapVisible(tester, find.text('Anladım'));
-    expect(find.text('Kelimemi Gör'), findsNothing);
-    await tapVisible(tester, find.text('Oyuna Başla'));
-    expect(find.text('Kelimemi Gör'), findsOneWidget);
+    expect(find.text('Bilgimi Gör'), findsNothing);
+    await tapVisible(tester, find.text('Oyunu Başlat'));
+    expect(find.text('Bilgimi Gör'), findsOneWidget);
     expect(find.byType(BottomSheet), findsNothing);
     expect(
       container.read(appRouterProvider).state.uri.path,
@@ -317,4 +318,61 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+  testWidgets('Geçersiz sonuç adresi güvenli oyun listesine döner', (
+    tester,
+  ) async {
+    final container = await openApp(tester);
+    container.read(appRouterProvider).go('/games/undercover_results');
+    await tester.pumpAndSettle();
+    expect(container.read(appRouterProvider).state.uri.path, '/games');
+    expect(find.text('GİZLİ KELİME'), findsNothing);
+  });
+  testWidgets(
+    'Sonuçlarda Ana Menü oturumu kapatır ve eski sonuçlar geri gelmez',
+    (tester) async {
+      final container = await openApp(tester);
+      container.read(appRouterProvider).go('/games/undercover');
+      await tester.pumpAndSettle();
+      final controller = container.read(undercoverSessionProvider.notifier);
+      controller.start(['Ayşe', 'Mehmet', 'Deniz']);
+      for (var id = 0; id < 3; id++) {
+        controller.reveal(id);
+        controller.next(id);
+      }
+      final spy =
+          container
+              .read(undercoverSessionProvider)!
+              .players
+              .firstWhere((p) => p.role == UndercoverRole.spy)
+              .id;
+      controller.beginVoting(container.read(undercoverSessionProvider)!.round!);
+      while (container.read(undercoverSessionProvider)!.phase ==
+          UndercoverPhase.voting) {
+        final round = container.read(undercoverSessionProvider)!.round!;
+        controller.vote(
+          round,
+          round.voter!,
+          round.voter == spy ? round.candidates.first : spy,
+        );
+      }
+      await tester.pumpAndSettle();
+      await tapVisible(tester, find.text('Oyun Sonuçları'));
+      expect(
+        find.byKey(const ValueKey('undercover-result-word')),
+        findsOneWidget,
+      );
+      await tapVisible(tester, find.text('Ana Menü'));
+      expect(container.read(appRouterProvider).state.uri.path, '/');
+      expect(container.read(undercoverSessionProvider), isNull);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('undercover-result-word')),
+        findsNothing,
+      );
+      container.read(appRouterProvider).go('/games/undercover');
+      await tester.pumpAndSettle();
+      expect(find.text('Oyunu Başlat'), findsOneWidget);
+    },
+  );
 }
