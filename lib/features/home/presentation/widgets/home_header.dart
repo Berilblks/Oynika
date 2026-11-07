@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../games/domain/party_game.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
@@ -29,13 +30,16 @@ class HomeHeader extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 6),
-              Text(
-                'Arkadaşlarını topla,\neğlence başlasın!',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurfaceVariant,
-                  height: 1.2,
+              SizedBox(
+                width: 160,
+                child: Text(
+                  PartyGame.supportingText,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurfaceVariant,
+                    height: 1.2,
+                  ),
                 ),
               ),
             ],

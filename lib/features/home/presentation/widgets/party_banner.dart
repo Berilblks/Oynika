@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../games/domain/party_game.dart';
 import '../../../../app/theme/app_theme.dart';
 
 class PartyBanner extends StatelessWidget {
@@ -49,15 +50,18 @@ class PartyBanner extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Oyunlarla\ndaha yakın olun!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: compact ? 25 : 28,
-                      fontWeight: FontWeight.w900,
-                      fontVariations: AppTheme.displayWeight,
-                      height: 1.08,
-                      letterSpacing: -0.6,
+                  SizedBox(
+                    width: constraints.maxWidth * .60,
+                    child: Text(
+                      PartyGame.slogan,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: compact ? 25 : 28,
+                        fontWeight: FontWeight.w900,
+                        fontVariations: AppTheme.displayWeight,
+                        height: 1.08,
+                        letterSpacing: -0.6,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -73,7 +77,7 @@ class PartyBanner extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 44),
                     child: const Text(
-                      '5 farklı oyun, sınırsız kahkaha!',
+                      'Bir oyun seç, eğlenceyi başlat!',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 13,

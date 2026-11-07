@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:oynika/app/app.dart';
+import 'package:oynika/shared/widgets/game_card.dart';
 import 'package:oynika/app/router/app_router.dart';
 import 'package:oynika/app/theme/theme_mode_provider.dart';
 import 'package:oynika/features/games/domain/party_game.dart';
@@ -55,14 +56,11 @@ void main() {
       'assets/branding/oynika_logo_borderless.png',
     );
     expect(logo.fit, BoxFit.contain);
-    expect(
-      find.text('Arkadaşlarını topla,\neğlence başlasın!'),
-      findsOneWidget,
-    );
+    expect(find.text(PartyGame.supportingText), findsOneWidget);
     expect(find.text('PARTİ ZAMANI'), findsOneWidget);
   });
 
-  testWidgets('Beş oyunun adı ve geliştirme durumu görünür', (tester) async {
+  testWidgets('Dört oyunun adı ve geliştirme durumu görünür', (tester) async {
     await openApp(tester);
     for (final game in PartyGame.values) {
       final title = find.text(game.title);
@@ -71,12 +69,60 @@ void main() {
       await tester.pumpAndSettle();
       expect(title.hitTestable(), findsOneWidget);
     }
-    await tester.ensureVisible(
-      find.text(
-        'Tabu ve Sessiz Sinema hazır! Diğer oyunları şimdilik keşfedebilirsin.',
-      ),
-    );
+    await tester.ensureVisible(find.text(PartyGame.availabilityMessage));
     expect(tester.takeException(), isNull);
+  });
+
+  for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+    testWidgets('V1 katalog sırası, dört kart ve açıklamalar: $mode', (
+      tester,
+    ) async {
+      final container = await openApp(tester);
+      container.read(themeModeProvider.notifier).select(mode);
+      await tester.pumpAndSettle();
+      const titles = [
+        'Tabu',
+        'Sessiz Sinema',
+        'Aramızdaki Casus',
+        'Ben Kimim?',
+      ];
+      const descriptions = [
+        'Yasaklı kelimelere dikkat!',
+        'Konuşmadan anlat, takımın bilsin!',
+        'İpuçlarını takip et, casusu bul!',
+        'Sorular sor, kim olduğunu keşfet!',
+      ];
+      for (final path in ['/', '/games']) {
+        container.read(appRouterProvider).go(path);
+        await tester.pumpAndSettle();
+        final cards =
+            tester.widgetList<GameCard>(find.byType(GameCard)).toList();
+        expect(cards, hasLength(4));
+        expect(cards.map((card) => card.game.title), titles);
+        expect(cards.map((card) => card.game.description), descriptions);
+        expect(find.textContaining('Ben Hiç'), findsNothing);
+        expect(find.text(PartyGame.availabilityMessage), findsOneWidget);
+        for (final description in descriptions) {
+          expect(find.text(description), findsOneWidget);
+        }
+        expect(tester.takeException(), isNull);
+      }
+      container.read(appRouterProvider).go('/');
+      await tester.pumpAndSettle();
+      expect(find.text('4 Oyun, Tek Uygulama!'), findsOneWidget);
+      expect(find.text("Arkadaşlarınla eğlence Oynika'da!"), findsOneWidget);
+      expect(PartyGame.whoAmI.isPlayable, isTrue);
+      expect(PartyGame.values.where((game) => game.isPlayable), hasLength(4));
+    });
+  }
+  testWidgets('Kaldırılan oyun adresi listeye döner', (tester) async {
+    final container = await openApp(tester);
+    container.read(appRouterProvider).go('/games/never_have_i_ever');
+    await tester.pumpAndSettle();
+    expect(container.read(appRouterProvider).state.uri.path, '/games');
+    expect(find.textContaining('Ben Hiç'), findsNothing);
+    expect(PartyGame.fromSlug('never_have_i_ever'), isNull);
+    expect(find.byType(GameCard), findsNWidgets(4));
   });
 
   for (final game in PartyGame.values) {
@@ -93,13 +139,8 @@ void main() {
       } else if (game == PartyGame.undercover) {
         expect(find.text('Oyuncu Sayısı'), findsOneWidget);
       } else {
-        expect(find.text('Nasıl oynanır?'), findsOneWidget);
-        await tester.ensureVisible(find.text('Geliştirme aşamasında'));
-        await tester.pumpAndSettle();
-        expect(
-          find.text('Geliştirme aşamasında').hitTestable(),
-          findsOneWidget,
-        );
+        expect(find.text('Oyuncu Sayısı'), findsOneWidget);
+        expect(find.byKey(const ValueKey('who-start')), findsOneWidget);
       }
       await tester.tap(find.byTooltip('Geri'));
       await tester.pumpAndSettle();

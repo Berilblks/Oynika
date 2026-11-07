@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../games/domain/party_game.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/theme/theme_mode_provider.dart';
@@ -76,21 +77,19 @@ class SettingsScreen extends ConsumerWidget {
                 const SizedBox(height: 28),
                 Text('Oynika hakkında', style: theme.textTheme.titleLarge),
                 const SizedBox(height: 12),
-                const Text(
-                  'Oyun Başlasın, Eğlence Başlasın!',
+                Text(
+                  PartyGame.slogan,
                   style: TextStyle(fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Arkadaşlarını bir araya getiren beş parti oyunu. Tamamen Türkçe, çevrimdışı ve hesapsız.',
+                Text(
+                  'Oynika, arkadaşlarınla oynayabileceğin ${PartyGame.values.length} eğlenceli parti oyununu tek uygulamada buluşturur. Türkçe, çevrimdışı ve hesapsız.',
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Oyunlar geliştirme aşamasında. Bu sürümde oyun tanıtımlarını keşfedebilirsin.',
-                ),
+                Text(PartyGame.availabilityMessage),
                 const SizedBox(height: 24),
                 Text(
-                  'Sürüm 0.1.0+1 • Faz 2',
+                  'Sürüm 0.1.0+1 • V1 hazırlığı',
                   key: const ValueKey('app-version'),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,

@@ -9,20 +9,25 @@ class GameCollection extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Column(
     children: [
-      for (var row = 0; row < 2; row++) ...[
+      for (var row = 0; row < (PartyGame.values.length + 1) ~/ 2; row++) ...[
         IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(child: GameCard(game: PartyGame.values[row * 2])),
               const SizedBox(width: AppDimensions.itemSpacing),
-              Expanded(child: GameCard(game: PartyGame.values[row * 2 + 1])),
+              Expanded(
+                child:
+                    row * 2 + 1 < PartyGame.values.length
+                        ? GameCard(game: PartyGame.values[row * 2 + 1])
+                        : const SizedBox.shrink(),
+              ),
             ],
           ),
         ),
-        const SizedBox(height: AppDimensions.itemSpacing),
+        if (row * 2 + 2 < PartyGame.values.length)
+          const SizedBox(height: AppDimensions.itemSpacing),
       ],
-      const GameCard(game: PartyGame.neverHaveIEver, horizontal: true),
     ],
   );
 }

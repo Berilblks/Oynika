@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../games/domain/party_game.dart';
 
 import '../../../core/constants/app_dimensions.dart';
 import '../../../shared/widgets/game_collection.dart';
@@ -123,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const GameCollection(),
                     const SizedBox(height: 20),
                     Text(
-                      'Tabu ve Sessiz Sinema hazır! Diğer oyunları şimdilik keşfedebilirsin.',
+                      PartyGame.availabilityMessage,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

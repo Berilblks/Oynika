@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 enum PartyGame {
   taboo(
     title: 'Tabu',
-    description: 'Kelimeleri anlat,\ntabuları söyleme!',
+    description: 'Yasaklı kelimelere dikkat!',
     asset: 'taboo',
     background: Color(0xFFFFE3DE),
     accent: Color(0xFFB93F51),
@@ -15,7 +15,7 @@ enum PartyGame {
   ),
   charades(
     title: 'Sessiz Sinema',
-    description: 'Konuşmadan anlat,\ntahmin etmeye çalış!',
+    description: 'Konuşmadan anlat, takımın bilsin!',
     asset: 'charades',
     background: Color(0xFFE8DDFB),
     accent: Color(0xFF5631B4),
@@ -25,21 +25,9 @@ enum PartyGame {
       'Konuşmadan ve ses çıkarmadan doğru tahmine ulaşmaya çalışın.',
     ],
   ),
-  whoAmI(
-    title: 'Ben Kimim?',
-    description: 'Sorular sor,\nkim olduğunu bul!',
-    asset: 'who_am_i',
-    background: Color(0xFFFFEECA),
-    accent: Color(0xFF8D571E),
-    instructions: [
-      'Her oyuncuya, kendisinin görmediği bir kimlik verilir.',
-      'Sırayla evet ya da hayır ile yanıtlanabilen sorular sorun.',
-      'Aldığın ipuçlarını birleştirerek kim olduğunu bulmaya çalış.',
-    ],
-  ),
   undercover(
     title: 'Aramızdaki Casus',
-    description: 'İpuçlarını dinle,\ncasusu bul!',
+    description: 'İpuçlarını takip et, casusu bul!',
     asset: 'undercover',
     background: Color(0xFFD9F5E8),
     accent: Color(0xFF137E64),
@@ -55,21 +43,25 @@ enum PartyGame {
       'Kalan casuslar normal oyuncular kadar veya daha fazlaysa casuslar kazanır.',
     ],
   ),
-  neverHaveIEver(
-    title: 'Ben Hiç...',
-    description: 'Eğlenceli sorularla\narkadaşlarını daha iyi tanı!',
-    asset: 'never_have_i_ever',
-    background: Color(0xFFDCE9FF),
-    accent: Color(0xFF2553A5),
+  whoAmI(
+    isPlayable: true,
+    title: 'Ben Kimim?',
+    description: 'Sorular sor, kim olduğunu keşfet!',
+    asset: 'who_am_i',
+    background: Color(0xFFFFEECA),
+    accent: Color(0xFF8D571E),
     instructions: [
-      'Arkadaşlarınla bir çember oluştur.',
-      'Sırayla “Ben hiç...” ile başlayan bir ifadeyi okuyun.',
-      'Bu deneyimi yaşayanlar el kaldırsın; dilerseniz hikâyelerinizi paylaşın.',
-      'Katılmak istemediğin bir soruyu her zaman pas geçebilirsin.',
+      'Telefon alnına yatay tutulur. Hazırım ile kelime ve süre hemen başlar.',
+      'Diğer oyuncular ekrandaki kişinin kim olduğunu anlatır.',
+      'Doğru cevap +1, Pas 0 puandır. Öne eğ: Doğru; arkaya eğ: Pas. Yeni hareket için telefonu düz konuma getir. Dokunmatik butonlar da kullanılabilir.',
+      'Herkes eşit sayıda normal tur oynar. Hedefe erken ulaşan olsa bile mevcut tur sırası tamamlanır.',
+      'Tam tur sırası sonunda hedef puana ulaşan en yüksek puanlı oyuncu kazanır.',
+      'En yüksek puan eşitse yalnızca eşit oyuncular ek tur oynar; eşitlik çözülene kadar sürer.',
     ],
   );
 
   const PartyGame({
+    this.isPlayable = true,
     required this.title,
     required this.description,
     required this.asset,
@@ -78,12 +70,27 @@ enum PartyGame {
     required this.instructions,
   });
 
+  final bool isPlayable;
   final String title;
   final String description;
   final String asset;
   final Color background;
   final Color accent;
   final List<String> instructions;
+
+  static String get slogan => '${values.length} Oyun, Tek Uygulama!';
+  static const supportingText = "Arkadaşlarınla eğlence Oynika'da!";
+  static String get availabilityMessage {
+    final ready = values
+        .where((game) => game.isPlayable)
+        .map((game) => game.title)
+        .join(', ');
+    final planned = values
+        .where((game) => !game.isPlayable)
+        .map((game) => game.title)
+        .join(', ');
+    return '$ready oynanabilir.${planned.isEmpty ? '' : ' $planned geliştirme aşamasında.'}';
+  }
 
   String get assetPath => 'assets/illustrations/$asset.png';
   String get path => '/games/$asset';

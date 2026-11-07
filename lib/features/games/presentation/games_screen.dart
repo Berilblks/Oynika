@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../domain/party_game.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../shared/widgets/game_collection.dart';
 import '../../../shared/widgets/section_heading.dart';
@@ -17,7 +18,7 @@ class GamesScreen extends StatelessWidget {
           constraints: const BoxConstraints(
             maxWidth: AppDimensions.contentMaxWidth,
           ),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SectionHeading(title: 'Oyunlar'),
@@ -26,7 +27,7 @@ class GamesScreen extends StatelessWidget {
               SizedBox(height: 20),
               GameCollection(),
               SizedBox(height: 20),
-              Text('Tabu ve Sessiz Sinema hazır! Diğer oyunlar geliştirme aşamasında.'),
+              Text(PartyGame.availabilityMessage),
               SizedBox(height: 12),
             ],
           ),

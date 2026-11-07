@@ -1,8 +1,8 @@
 # Oynika
 
-Arkadaş ortamlarında oynanan beş parti oyununu bir araya getiren, Türkçe ve çevrimdışı Flutter uygulaması. Backend, üyelik ve giriş sistemi yoktur.
+Arkadaş ortamlarında oynanan dört parti oyununu bir araya getiren, Türkçe ve çevrimdışı Flutter uygulaması. Backend, üyelik ve giriş sistemi yoktur.
 
-Faz 1 altyapısı tamamlandı. **Faz 2** onaylanan ana ekran tasarımını, oyun tanıtımlarını, alt navigasyonu ve tema seçimini içerir. **Faz 3** ile Tabu oynanabilir durumdadır; 500 çevrimdışı Türkçe kart içerir. Faz 4 ile Sessiz Sinema da 300 film ve 200 dizi kartıyla oynanabilir. Diğer üç oyun tanıtım aşamasındadır.
+Faz 1 altyapısı tamamlandı. **Faz 2** onaylanan ana ekran tasarımını, oyun tanıtımlarını, alt navigasyonu ve tema seçimini içerir. **Faz 3** ile Tabu oynanabilir durumdadır; 500 çevrimdışı Türkçe kart içerir. Faz 4 ile Sessiz Sinema da 300 film ve 200 dizi kartıyla oynanabilir. Faz 5 ile Aramızdaki Casus da oynanabilir. Ben Kimim? Faz 6.3.1 ile 300 kart, gerçek tur, sayaç ve dokunmatik Doğru/Pas kontrolleriyle oynanabilir.
 
 ## Teknolojiler
 
@@ -58,7 +58,7 @@ android/
 ios/
 ```
 
-Beş oyunun açıklamaları, renkleri, asset yolları ve temel oynanış açıklamaları PartyGame içinde tutulur. Tabu kendi modülünü kullanır; diğer tanıtımlar ortak GameIntroScreen şablonuyla üretilir; kullanılmayan boş oyun ekranları yoktur.
+Dört oyunun sırası, açıklaması, renkleri, asset yolları, rotası ve oynanabilirlik durumu PartyGame içinde tutulur. Ana ekran ve Oyunlar sekmesi bu kataloğu kullanır. Oyun sayısı ve slogan katalogdan türetilir. Tabu, Sessiz Sinema ve Aramızdaki Casus kendi modüllerini kullanır; Ben Kimim? kendi ayar ve başlangıç modülünü kullanır.
 
 ## Ekranlar ve rotalar
 
@@ -67,9 +67,8 @@ Beş oyunun açıklamaları, renkleri, asset yolları ve temel oynanış açıkl
 - `/settings`: Sistem/Açık/Koyu tema, hakkında, sürüm ve açık kaynak lisansları.
 - `/games/taboo`: Tabu kurulumu ve beş evreli gerçek oyun akışı.
 - `/games/charades`: Sessiz Sinema kurulumu ve beş evreli oyun akışı.
-- `/games/who_am_i`
-- `/games/undercover`
-- `/games/never_have_i_ever`
+- `/games/who_am_i`: Oyuncu/süre ayarları, hazırlık, 3 saniyelik başlangıç, aktif tur, duraklatma ve tur sonuçları.
+- `/games/undercover`: Gizli dağıtım, ipucu, oylama, eleme, sonuç ve tekrar oynama.
 
 Tanıtım ekranlarında oyun adı, illüstrasyon, kısa açıklama, nasıl oynanır adımları ve geliştirme bilgisi bulunur. Geri butonu önceki ekrana döner; doğrudan açılan tanıtımlarda oyun listesine gider. Geçersiz oyun adresleri oyun listesine yönlenir.
 
@@ -83,15 +82,19 @@ Palet: koyu mor #46309B, lavanta #E8DDFB, krem #FFF9F1, mercan #FF8C85, sarı #F
 
 Tema seçimi Riverpod ile uygulama açıkken korunur. Uygulama yeniden başladığında Sistem seçilir; diske kalıcı kayıt henüz eklenmedi.
 
-İlk dört kart iki sütundur; Ben Hiç... kartı tam genişliktedir. Metinler kesilmeden sarılır, içerik kaydırılabilir, tabletlerde azami genişlik 720 mantıksal pikseldir. Kartlarda hafif basma animasyonu vardır. Ayrı AI illüstrasyonları ve Nunito fontunun kaynak/lisans bilgileri assets/README.md içindedir.
+Dört kart, katalog sırasına göre iki sütun ve iki satırda gösterilir. Metinler kesilmeden sarılır, içerik kaydırılabilir, tabletlerde azami genişlik 720 mantıksal pikseldir. Kartlarda hafif basma animasyonu vardır. Ayrı AI illüstrasyonları ve Nunito fontunun kaynak/lisans bilgileri assets/README.md içindedir.
 
-## Planlanan oyunlar
+## V1 oyun kataloğu
 
-1. Tabu
-2. Sessiz Sinema
-3. Ben Kimim?
-4. Aramızdaki Casus (kelime dağıtımı, ipucu, gizli oylama ve eleme)
-5. Ben Hiç...
+1. Tabu — oynanabilir.
+2. Sessiz Sinema — oynanabilir.
+3. Aramızdaki Casus — oynanabilir.
+4. Ben Kimim? — 300 kart ve dokunmatik kontrollerle oynanabilir.
+
+Ana slogan: **4 Oyun, Tek Uygulama!**
+Destekleyici metin: **Arkadaşlarınla eğlence Oynika'da!**
+
+Dört oyun da uygulama içinden oynanabilir. App Store yayın/hak ve cihaz incelemeleri ayrı hazırlık aşamasıdır. [V1 kapsamı](docs/v1_product_structure.md).
 
 ## Kurulum ve doğrulama
 
@@ -129,9 +132,9 @@ iOS yapılandırmaları korunmuştur; Windows ortamında iOS derlenmez. iOS ciha
 
 ## Testler
 
-Faz 1'in açılış, başlık, beş oyun ve küçük ekran kontrolleri korunup yeni tasarımın sloganına/yerleşimine uyarlandı. Faz 2'de toplam 15 widget testi:
+Faz 1'in açılış, başlık, dört oyun ve küçük ekran kontrolleri korunup yeni tasarımın sloganına/yerleşimine uyarlandı. Faz 2'de toplam 15 widget testi:
 
-- Ana ekranın hatasız açılması, slogan ve beş oyunun erişilebilir olması
+- Ana ekranın hatasız açılması, slogan ve dört oyunun erişilebilir olması
 - Her kartın doğru oyun tanıtımını açması ve geri dönüş
 - Üç alt sekme, Oyunlar ekranından tanıtım, alt Ayarlar ikonu
 - Sistem/Açık/Koyu seçimi ve sekmeler arasında temanın korunması
@@ -144,7 +147,7 @@ Faz 2 doğrulaması (18 Ekim 2026): pub get başarılı, analyze temiz, 15 test 
 
 ## Bilinen sınırlar
 
-- Tabu ve Sessiz Sinema oynanabilir; diğer üç oyun geliştirme aşamasındadır.
+- Dört oyun oynanabilir. Ben Kimim? hareket sensörleri sonraki faza bırakıldı; bu sürüm dokunmatik kontroller kullanır.
 - Tema seçimi yalnızca oturum boyunca korunur.
 - Üretilen illüstrasyonlar referansın yeniden yorumudur; birebir aynı çizimler değildir.
 - iOS derleme/cihaz testi yapılmadı.
@@ -169,4 +172,43 @@ Faz 3.1: mevcut 250 kart korunarak 250 yeni kart eklendi. Her kategoride 50 kart
 
 ## Faz 4 — Sessiz Sinema
 
-500 yapım kartı (300 Film / 200 Dizi), sınırsız dönüşümlü tur, hedef puan, üç pas ve konuşmadan anlatım. Ekranlar, mimari, kaynak doğrulaması, 30 örnek ve test bilgileri: [Faz 4 raporu](docs/charades_phase4.md). Yeni bağımlılık eklenmedi.
+500 yapım kartı (300 Film / 200 Dizi), sınırsız dönüşümlü tur, hedef puan, sınırsız pas ve konuşmadan anlatım. Ekranlar, mimari, kaynak doğrulaması, 30 örnek ve test bilgileri: [Faz 4 raporu](docs/charades_phase4.md). Yeni bağımlılık eklenmedi.
+
+
+## Faz 6.1 — Ben Kimim? ayarları
+
+`lib/features/games/who_am_i/` altında domain, application ve presentation katmanları bulunur. 2–20 oyuncu (varsayılan 4), düzenlenebilir benzersiz isimler ve 60/90/120 saniye (varsayılan 90) seçimi desteklenir. Başlatma ayarları doğrular ve geçici başlangıç ekranını açar. Kartlar, sensör, puanlama ve geri sayım bu fazda yoktur; katalogda oyun hâlâ geliştirme aşamasındadır. [Faz 6.1 raporu](docs/who_phase61.md).
+
+
+## Faz 6.2 — Ben Kimim? kart havuzu
+
+300 yerel kart `assets/data/who_am_i_cards.json` içindedir. Kategori/zorluk enumları, asset repository, enjekte edilebilir rastgelelik ve oturuma bağlı tekrarsız deste servisi eklendi. Faz 6.1 ekranları korunur; oynanış ve sensörler bu fazda yoktur. [Kategori, zorluk ve yayın incelemesi raporu](docs/who_phase62.md).
+
+
+## Faz 6.3.1 — Ben Kimim? gerçek oynanış
+
+Ayarlar → oyuncu hazırlığı → 3/2/1 → aktif tur → tur sonucu → sıradaki oyuncu. Doğru +1, Pas 0 ve sınırsız pas; sınırsız oyuncu turları ve korunmuş toplam puanlar. Süre monoton saate dayanır; arka planda kart gizlenip tur duraklar ve manuel devam gerekir. 300 kartlık deste oturum boyunca korunur; yeniden başlatma yeni deste ve sıfır puanlarla başlar. [Faz 6.3.1 raporu](docs/who_phase631.md).
+
+## Faz 6.3.1.1 — yatay oynanış
+
+Oyuncu hazırlığı dikey; 3/2/1 sonrası yatay görünüm ve Hazırım onayıyla tur başlar. Mor karttaki büyük beyaz kelime ve alt Doğru/Pas kontrolleri yatay ekrana uyarlanır. Sonuç ve çıkışta dikeye dönülür. [Yön yönetimi ve doğrulama](docs/who_phase631_landscape.md).
+
+## Faz 6.3.2 — hareketle Doğru/Pas
+
+Hazırım sonrasında kısa nötr kalibrasyon, öne eğerek Doğru ve arkaya eğerek Pas. Her yeni hareket için kararlı nötr pozisyona dönüş gerekir. Sensör kullanmadan dokunmatik devam seçeneği korunur. [Sensör mimarisi, eşikler ve Redmi kontrol listesi](docs/who_phase632.md).
+
+## Faz 6.3.2.1 — anında başlatma ve sensör tanısı
+
+Hazırım kelimeyi ve süreyi hemen başlatır. Gyro/yerçekimi referansı arka planda oluşur; sensör oyunu engellemez. Üstte yeniden ayarlama kontrolü ve yalnızca debug derlemesinde sensör paneli bulunur. [Düzeltme raporu ve Redmi test adımları](docs/who_phase6321.md).
+
+## Faz 6.3.2.2 — sade yatay oyun ekranı
+
+İnce oyuncu/süre/tur puanı çubuğu, büyük mor kelime kartı ve iki alt kontrol. Sensör tanısı debug APK'da da varsayılan gizlidir; release'te gösterilmez. [Görsel düzen ve geliştirici debug seçeneği](docs/who_phase6322.md).
+
+## Faz 6.4 — hedef puan, genel tablo ve insan kartları
+
+Ben Kimim? artık varsayılan 20 hedef puanıyla oynanır; bütün oyuncular normal tur sırasını tamamlamadan kazanan belirlenmez. Eşit liderler ek tur oynar. Genel tablo ve kazanan ekranı eklendi. Kart havuzu 300 insan/insan karakteri adıyla yenilendi. [Kurallar, kategori dağılımı ve doğrulama](docs/who_phase64.md).
+
+## Faz 6.5 — kalite kontrolü ve iOS hazırlığı
+
+Gecikmiş/çift arayüz çağrılarına karşı korumalar, iOS yön ipucu düzeltmesi ve CocoaPods hazırlığı tamamlandı. Onaylanan sensör eşikleri ve tasarım korundu. [Kalite raporu ve Mac/Xcode kontrol listesi](docs/who_phase65.md).

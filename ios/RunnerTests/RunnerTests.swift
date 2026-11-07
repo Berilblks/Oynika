@@ -1,12 +1,17 @@
-import Flutter
 import UIKit
 import XCTest
+@testable import Runner
 
 class RunnerTests: XCTestCase {
-
-  func testExample() {
-    // If you add code to the Runner application, consider adding tests here.
-    // See https://developer.apple.com/documentation/xctest for more information about using XCTest.
+  func testHomeOnLeftMeansNaturalXPointsDown() {
+    XCTAssertEqual(whoLandscapeUpSign(for: .landscapeLeft), -1.0)
   }
-
+  func testHomeOnRightMeansNaturalXPointsUp() {
+    XCTAssertEqual(whoLandscapeUpSign(for: .landscapeRight), 1.0)
+  }
+  func testPortraitAndUnknownDoNotInventLandscapeHint() {
+    XCTAssertNil(whoLandscapeUpSign(for: .portrait))
+    XCTAssertNil(whoLandscapeUpSign(for: .portraitUpsideDown))
+    XCTAssertNil(whoLandscapeUpSign(for: .unknown))
+  }
 }

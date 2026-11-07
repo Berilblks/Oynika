@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/games/domain/party_game.dart';
-import '../../features/games/presentation/game_intro_screen.dart';
+import '../../features/games/who_am_i/presentation/who_screen.dart';
 import '../../features/games/presentation/games_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
@@ -63,7 +63,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             PartyGame.taboo => const TabuScreen(),
             PartyGame.charades => const CharadesScreen(),
             PartyGame.undercover => const UndercoverSetupScreen(),
-            _ => GameIntroScreen(game: game),
+            PartyGame.whoAmI => const WhoScreen(),
           };
         },
       ),
