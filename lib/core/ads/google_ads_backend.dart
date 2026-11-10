@@ -137,7 +137,9 @@ class GoogleAdsBackend implements AdsBackend {
     try {
       await InterstitialAd.load(
         adUnitId: unit,
-        request: const AdRequest(),
+        request: Platform.isIOS
+            ? const AdRequest(nonPersonalizedAds: true)
+            : const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (ad) {
             _logAdQa('Interstitial loaded');
