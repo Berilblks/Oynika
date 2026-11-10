@@ -22,6 +22,7 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
   final _red = TextEditingController(text: 'Kırmızı Takım');
   int _seconds = 90;
   int _targetScore = 20;
+  bool _askingExit = false;
   CharadesController get controller => ref.read(charadesGameProvider.notifier);
 
   @override
@@ -44,6 +45,7 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
   }
 
   Future<void> _exit() async {
+    if (!mounted || _askingExit) return;
     if (ref.read(charadesGameProvider).phase == GamePhase.result) {
       context.go('/games');
       return;
@@ -53,6 +55,7 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
       return;
     }
     controller.pause();
+    _askingExit = true;
     final leave = await showDialog<bool>(
       context: context,
       builder:
@@ -71,6 +74,7 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
             ],
           ),
     );
+    _askingExit = false;
     if (leave == true && mounted) _leave();
   }
 

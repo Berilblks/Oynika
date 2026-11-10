@@ -21,6 +21,7 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
   final _red = TextEditingController(text: 'Kırmızı Takım');
   int _seconds = 90;
   int _targetScore = 20;
+  bool _askingExit = false;
   GameController get controller => ref.read(tabuGameProvider.notifier);
 
   @override
@@ -43,11 +44,13 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
   }
 
   Future<void> _exit() async {
+    if (!mounted || _askingExit) return;
     if (ref.read(tabuGameProvider).phase == GamePhase.setup) {
       _leave();
       return;
     }
     controller.pause();
+    _askingExit = true;
     final leave = await showDialog<bool>(
       context: context,
       builder:
@@ -66,6 +69,7 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
             ],
           ),
     );
+    _askingExit = false;
     if (leave == true && mounted) _leave();
   }
 

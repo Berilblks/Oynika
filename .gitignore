@@ -45,3 +45,6 @@ app.*.map.json
 
 # Local Phase 3 design screenshot; excluded from source commits.
 /design_reference/tabu_phase3.png
+
+# FVM Version Cache
+.fvm/

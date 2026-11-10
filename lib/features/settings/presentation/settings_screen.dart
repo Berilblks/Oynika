@@ -33,42 +33,53 @@ class SettingsScreen extends ConsumerWidget {
                 const SizedBox(height: 6),
                 const Text('Sistem seçeneği telefonunun temasını izler.'),
                 const SizedBox(height: 12),
-                for (final option in [
-                  (ThemeMode.system, 'Sistem', Icons.brightness_auto_rounded),
-                  (ThemeMode.light, 'Açık', Icons.light_mode_rounded),
-                  (ThemeMode.dark, 'Koyu', Icons.dark_mode_rounded),
-                ])
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Material(
-                      color:
-                          selectedMode == option.$1
-                              ? theme.colorScheme.primary.withValues(
-                                alpha: 0.10,
-                              )
-                              : theme.colorScheme.onSurface.withValues(
-                                alpha: 0.035,
-                              ),
-                      borderRadius: BorderRadius.circular(20),
-                      child: RadioListTile<ThemeMode>(
-                        key: ValueKey('theme-${option.$1.name}'),
-                        value: option.$1,
-                        groupValue: selectedMode,
-                        onChanged: (mode) {
-                          if (mode != null) {
-                            ref.read(themeModeProvider.notifier).select(mode);
-                          }
-                        },
-                        title: Row(
-                          children: [
-                            Icon(option.$3, size: 21),
-                            const SizedBox(width: 12),
-                            Flexible(child: Text(option.$2)),
-                          ],
+                RadioGroup<ThemeMode>(
+                  groupValue: selectedMode,
+                  onChanged: (mode) {
+                    if (mode != null) {
+                      ref.read(themeModeProvider.notifier).select(mode);
+                    }
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final option in [
+                        (
+                          ThemeMode.system,
+                          'Sistem',
+                          Icons.brightness_auto_rounded,
                         ),
-                      ),
-                    ),
+                        (ThemeMode.light, 'Açık', Icons.light_mode_rounded),
+                        (ThemeMode.dark, 'Koyu', Icons.dark_mode_rounded),
+                      ])
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Material(
+                            color: selectedMode == option.$1
+                                ? theme.colorScheme.primary.withValues(
+                                    alpha: 0.10,
+                                  )
+                                : theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.035,
+                                  ),
+                            borderRadius: BorderRadius.circular(20),
+                            child: RadioListTile<ThemeMode>(
+                              key: ValueKey('theme-${option.$1.name}'),
+                              value: option.$1,
+
+                              title: Row(
+                                children: [
+                                  Icon(option.$3, size: 21),
+                                  const SizedBox(width: 12),
+                                  Flexible(child: Text(option.$2)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
+                ),
                 const SizedBox(height: 12),
                 Text(
                   'Seçimin uygulama açıkken korunur.',
@@ -97,12 +108,11 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
                 TextButton.icon(
-                  onPressed:
-                      () => showLicensePage(
-                        context: context,
-                        applicationName: 'Oynika',
-                        applicationVersion: '0.1.0+1',
-                      ),
+                  onPressed: () => showLicensePage(
+                    context: context,
+                    applicationName: 'Oynika',
+                    applicationVersion: '0.1.0+1',
+                  ),
                   icon: const Icon(Icons.description_outlined),
                   label: const Text('Açık kaynak lisansları'),
                 ),
