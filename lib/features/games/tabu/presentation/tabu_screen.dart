@@ -1,3 +1,4 @@
+import '../../../../core/ads/google_ads_backend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -45,6 +46,7 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
 
   Future<void> _exit() async {
     if (!mounted || _askingExit) return;
+    final result = ref.read(tabuGameProvider);
     if (ref.read(tabuGameProvider).phase == GamePhase.setup) {
       _leave();
       return;
@@ -70,7 +72,24 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
           ),
     );
     _askingExit = false;
-    if (leave == true && mounted) _leave();
+    if (leave == true && mounted) {
+      if (result.phase == GamePhase.result) {
+        _leaveResult(result, _leave);
+      } else {
+        _leave();
+      }
+    }
+  }
+
+  void _leaveResult(GameState result, VoidCallback leave) {
+    if (!mounted) return;
+    ref
+        .read(adsServiceProvider)
+        .leaveResult(
+          result,
+          () => mounted && identical(ref.read(tabuGameProvider), result),
+          leave,
+        );
   }
 
   void _leave() {
@@ -84,6 +103,9 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(tabuGameProvider);
+    if (state.phase == GamePhase.result) {
+      ref.read(adsServiceProvider).recordCompletion(state);
+    }
     final playing = state.phase == GamePhase.playing;
     final setup = state.phase == GamePhase.setup;
     final content = switch (state.phase) {
@@ -493,13 +515,13 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
           const SizedBox(height: 30),
           TabuButton(
             'Tekrar Oyna',
-            onPressed: controller.replay,
+            onPressed: () => _leaveResult(state, controller.replay),
             icon: Icons.replay_rounded,
           ),
           const SizedBox(height: 14),
           TabuButton(
             'Ana Sayfaya Dön',
-            onPressed: () => context.go('/'),
+            onPressed: () => _leaveResult(state, () => context.go('/')),
             secondary: true,
             icon: Icons.home_rounded,
           ),

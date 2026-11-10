@@ -1,3 +1,4 @@
+import '../../../../core/ads/google_ads_backend.dart';
 import 'package:go_router/go_router.dart';
 import 'who_scoreboard.dart';
 import 'who_winner_screen.dart';
@@ -452,25 +453,17 @@ class _WhoGameScreenState extends ConsumerState<WhoGameScreen>
       );
     }
     if (s.phase == WhoPhase.winner) {
+      final ads = ref.read(adsServiceProvider)..recordCompletion(s);
+      bool isCurrent() => mounted && identical(ref.read(whoSessionProvider), s);
       return WhoWinnerScreen(
         session: s,
-        onReplay: () {
-          if (!mounted) return;
-          final current = ref.read(whoSessionProvider);
-          if (current?.phase == WhoPhase.winner &&
-              identical(current?.settings, s.settings)) {
-            controller.restart();
-          }
-        },
-        onGames: () {
-          if (!mounted ||
-              !identical(ref.read(whoSessionProvider)?.settings, s.settings)) {
-            return;
-          }
-          _stopMotion();
-          controller.reset();
-          context.go('/games');
-        },
+        onReplay: () => ads.leaveResult(s, isCurrent, controller.restart),
+        onGames:
+            () => ads.leaveResult(s, isCurrent, () {
+              _stopMotion();
+              controller.reset();
+              context.go('/games');
+            }),
       );
     }
     late Widget content, bottom;

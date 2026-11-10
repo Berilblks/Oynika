@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/ads/google_ads_backend.dart';
 
 import 'undercover_visuals.dart';
 import '../../domain/party_game.dart';
@@ -265,6 +266,11 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
     if (session != null) {
       final player = session.current;
       final controller = ref.read(undercoverSessionProvider.notifier);
+      final finished = session.phase == UndercoverPhase.finished;
+      final ads = ref.read(adsServiceProvider);
+      if (finished) ads.recordCompletion(session);
+      bool isCurrent() =>
+          mounted && identical(ref.read(undercoverSessionProvider), session);
       if (identical(_viewingResults, session) &&
           session.phase == UndercoverPhase.finished) {
         return UndercoverResultsScreen(
@@ -272,13 +278,19 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
           busy: _starting,
           onBack: () => setState(() => _viewingResults = null),
           onReplay:
-              () =>
-                  _launchGame(() => controller.restartWithSamePlayers(session)),
-          onHome: () {
-            _viewingResults = null;
-            controller.exit();
-            context.go('/');
-          },
+              () => ads.leaveResult(
+                session,
+                isCurrent,
+                () => _launchGame(
+                  () => controller.restartWithSamePlayers(session),
+                ),
+              ),
+          onHome:
+              () => ads.leaveResult(session, isCurrent, () {
+                _viewingResults = null;
+                controller.exit();
+                context.go('/');
+              }),
         );
       }
       final round = session.round;
@@ -305,7 +317,10 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
           },
           enablePrivacy: _enablePrivacy,
           releasePrivacy: _releasePrivacy,
-          onExit: controller.exit,
+          onExit:
+              finished
+                  ? () => ads.leaveResult(session, isCurrent, controller.exit)
+                  : controller.exit,
         );
       }
       return UndercoverDistributionScreen(

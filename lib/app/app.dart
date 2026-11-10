@@ -1,15 +1,31 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/ads/google_ads_backend.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_mode_provider.dart';
 
-class OynikaApp extends ConsumerWidget {
+class OynikaApp extends ConsumerStatefulWidget {
   const OynikaApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
+  ConsumerState<OynikaApp> createState() => _OynikaAppState();
+}
+
+class _OynikaAppState extends ConsumerState<OynikaApp> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(ref.read(adsServiceProvider).start());
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => MaterialApp.router(
     title: 'Oynika',
     debugShowCheckedModeBanner: false,
     theme: AppTheme.light,

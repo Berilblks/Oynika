@@ -1,3 +1,4 @@
+import '../../../../core/ads/google_ads_backend.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -46,8 +47,9 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
 
   Future<void> _exit() async {
     if (!mounted || _askingExit) return;
-    if (ref.read(charadesGameProvider).phase == GamePhase.result) {
-      context.go('/games');
+    final result = ref.read(charadesGameProvider);
+    if (result.phase == GamePhase.result) {
+      _leaveResult(result, () => context.go('/games'));
       return;
     }
     if (ref.read(charadesGameProvider).phase == GamePhase.setup) {
@@ -78,6 +80,17 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
     if (leave == true && mounted) _leave();
   }
 
+  void _leaveResult(CharadesState result, VoidCallback leave) {
+    if (!mounted) return;
+    ref
+        .read(adsServiceProvider)
+        .leaveResult(
+          result,
+          () => mounted && identical(ref.read(charadesGameProvider), result),
+          leave,
+        );
+  }
+
   void _leave() {
     if (context.canPop()) {
       context.pop();
@@ -89,6 +102,9 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(charadesGameProvider);
+    if (state.phase == GamePhase.result) {
+      ref.read(adsServiceProvider).recordCompletion(state);
+    }
     final playing = state.phase == GamePhase.playing;
     final setup = state.phase == GamePhase.setup;
     final content = switch (state.phase) {
@@ -495,13 +511,13 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
           const SizedBox(height: 30),
           TabuButton(
             'Tekrar Oyna',
-            onPressed: controller.replay,
+            onPressed: () => _leaveResult(state, controller.replay),
             icon: Icons.replay_rounded,
           ),
           const SizedBox(height: 14),
           TabuButton(
             'Oyunlara Dön',
-            onPressed: () => context.go('/games'),
+            onPressed: () => _leaveResult(state, () => context.go('/games')),
             secondary: true,
             icon: Icons.home_rounded,
           ),

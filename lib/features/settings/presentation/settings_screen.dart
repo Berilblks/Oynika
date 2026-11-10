@@ -3,6 +3,7 @@ import '../../games/domain/party_game.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/theme/theme_mode_provider.dart';
+import '../../../core/ads/google_ads_backend.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../shared/widgets/section_heading.dart';
 
@@ -13,6 +14,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final selectedMode = ref.watch(themeModeProvider);
+    final ads = ref.watch(adsServiceProvider);
     return SafeArea(
       bottom: false,
       child: SingleChildScrollView(
@@ -115,6 +117,30 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   icon: const Icon(Icons.description_outlined),
                   label: const Text('Açık kaynak lisansları'),
+                ),
+                ValueListenableBuilder(
+                  valueListenable: ads.status,
+                  builder: (context, status, _) => status.privacyOptions
+                      ? TextButton.icon(
+                          icon: const Icon(Icons.privacy_tip_outlined),
+                          label: const Text('Reklam gizlilik seçenekleri'),
+                          onPressed: status.busy
+                              ? null
+                              : () async {
+                                  final success = await ads
+                                      .openPrivacyOptions();
+                                  if (!success && context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Gizlilik seçenekleri açılamadı.',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ],
             ),
