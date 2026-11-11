@@ -1,3 +1,5 @@
+import 'package:go_router/go_router.dart';
+import '../../../core/ads/ads_diagnostics.dart';
 import 'package:flutter/material.dart';
 import '../../games/domain/party_game.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -118,6 +120,12 @@ class SettingsScreen extends ConsumerWidget {
                   icon: const Icon(Icons.description_outlined),
                   label: const Text('Açık kaynak lisansları'),
                 ),
+                if (ref.watch(adsQaEnabledProvider))
+                  TextButton.icon(
+                    icon: const Icon(Icons.bug_report_outlined),
+                    label: const Text('Reklam tanılama (QA)'),
+                    onPressed: () => context.push('/qa/ads'),
+                  ),
                 ValueListenableBuilder(
                   valueListenable: ads.status,
                   builder: (context, status, _) => status.privacyOptions

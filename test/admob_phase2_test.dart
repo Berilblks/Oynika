@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:oynika/app/app.dart';
 import 'package:oynika/app/router/app_router.dart';
 import 'package:oynika/core/ads/ad_units.dart';
+import 'package:oynika/core/ads/ads_diagnostics.dart';
 import 'package:oynika/core/ads/ads_service.dart';
 import 'package:oynika/core/ads/google_ads_backend.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' show AdWidget;
@@ -36,6 +37,8 @@ class _Backend implements AdsBackend {
   bool failConsent = false;
   bool failInitialize = false;
   bool revokeOnPrivacy = false;
+  Completer<void>? pendingUpdate;
+  Future<InterstitialPlacement?>? pendingInterstitial;
   int updates = 0;
   int initialized = 0;
   int interstitialRequests = 0;
@@ -44,6 +47,7 @@ class _Backend implements AdsBackend {
   @override
   Future<void> updateConsent() async {
     updates++;
+    await pendingUpdate?.future;
     if (failConsent) throw StateError('Consent failed');
   }
 
@@ -67,16 +71,25 @@ class _Backend implements AdsBackend {
   @override
   Future<InterstitialPlacement?> loadInterstitial(String unit) async {
     interstitialRequests++;
+    if (pendingInterstitial != null) return pendingInterstitial;
     final ad = interstitial;
     interstitial = null;
     return ad;
   }
 }
 
-AdsService _service(_Backend backend) {
+AdsService _service(
+  _Backend backend, {
+  bool qa = false,
+  AdsDiagnostics? diagnostics,
+  Duration retryCooldown = const Duration(seconds: 15),
+}) {
   final service = AdsService(
     backend,
     interstitialAdUnitFor(TargetPlatform.android, release: false),
+    qaEnabled: qa,
+    diagnostics: diagnostics,
+    retryCooldown: retryCooldown,
   );
   addTearDown(service.dispose);
   return service;
@@ -328,6 +341,7 @@ void main() {
       expect(second.shown, 0);
       ads.leaveResult(result, () => true, exit);
       ads.leaveResult(result, () => true, exit);
+      await _flush();
       expect(second.shown, 1);
       expect(exits, 1);
       backend.interstitial = fourth;
@@ -339,6 +353,7 @@ void main() {
       // Replays are new completions only when their own terminal state arrives.
       ads.leaveResult(Object(), () => true, exit);
       ads.leaveResult(Object(), () => true, exit);
+      await _flush();
       expect(fourth.shown, 1);
       expect(exits, 3);
       fourth.completion.completeError(StateError('show failed'));
@@ -375,6 +390,7 @@ void main() {
       var current = true;
       var navigations = 0;
       ads.leaveResult(Object(), () => current, () => navigations++);
+      await _flush();
       expect(fullscreen.shown, 1);
       current = false;
       fullscreen.completion.complete();
@@ -409,4 +425,210 @@ void main() {
       tester.getTopLeft(find.byType(NavigationBar)).dy,
     );
   });
+  test('QA forces official test units even in a release build', () {
+    for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+      final unit = interstitialAdUnitFor(platform, release: true, qa: true);
+      expect(isGoogleTestInterstitialUnit(unit), isTrue);
+      expect(
+        isGoogleTestInterstitialUnit(
+          interstitialAdUnitFor(platform, release: true),
+        ),
+        isFalse,
+      );
+    }
+  });
+
+  test(
+    'Initialization failure can recover without restarting the app',
+    () async {
+      final backend = _Backend()..failInitialize = true;
+      final ads = _service(backend, retryCooldown: Duration.zero);
+      await ads.start();
+      expect(ads.status.value.ready, isFalse);
+      backend.failInitialize = false;
+      expect(await ads.retryConsent(), isTrue);
+      await _flush();
+      expect(ads.status.value.ready, isTrue);
+      expect(backend.initialized, 2);
+      expect(backend.interstitialRequests, 1);
+    },
+  );
+
+  test(
+    'Offline startup retries are serialized and resume retries are capped',
+    () async {
+      final backend = _Backend()
+        ..failConsent = true
+        ..allowed = false;
+      final ads = _service(backend, retryCooldown: Duration.zero);
+      await ads.start();
+      for (var i = 0; i < 5; i++) {
+        await ads.retryConsent(automatic: true);
+      }
+      expect(backend.updates, 4);
+      expect(backend.interstitialRequests, 0);
+      backend.failConsent = false;
+      backend.allowed = true;
+      await ads.retryConsent();
+      await _flush();
+      expect(backend.updates, 5);
+      expect(ads.status.value.ready, isTrue);
+      expect(backend.interstitialRequests, 1);
+      await ads.retryConsent(automatic: true);
+      expect(backend.updates, 5);
+    },
+  );
+
+  test('Pending UMP work and cooldown prevent repeated requests', () async {
+    final backend = _Backend()..pendingUpdate = Completer<void>();
+    final ads = _service(backend);
+    final startup = ads.start();
+    expect(await ads.retryConsent(), isFalse);
+    backend.pendingUpdate!.complete();
+    await startup;
+    expect(await ads.retryConsent(), isFalse);
+    expect(backend.updates, 1);
+  });
+
+  test('QA controls require QA mode and an official test unit', () async {
+    final backend = _Backend();
+    final ads = _service(backend);
+    await ads.loadQaTestAd();
+    await ads.showQaTestAd(() => true);
+    expect(backend.interstitialRequests, 0);
+    final production = AdsService(
+      backend,
+      interstitialAdUnitFor(TargetPlatform.iOS, release: true),
+      qaEnabled: true,
+    );
+    addTearDown(production.dispose);
+    await production.loadQaTestAd();
+    expect(production.qaEnabled, isFalse);
+    expect(backend.interstitialRequests, 0);
+  });
+
+  test(
+    'QA load and show preserve the completion counter and reject duplicate shows',
+    () async {
+      final ad = _Interstitial();
+      final backend = _Backend()..interstitial = ad;
+      final diagnostics = AdsDiagnostics();
+      addTearDown(diagnostics.dispose);
+      final ads = _service(backend, qa: true, diagnostics: diagnostics);
+      await ads.start();
+      await _flush();
+      expect(ads.qaCanShow, isTrue);
+      expect(diagnostics.value(AdQaField.unitType), 'test');
+      final show = ads.showQaTestAd(() => true);
+      final duplicate = ads.showQaTestAd(() => true);
+      await _flush();
+      expect(ad.shown, 1);
+      expect(ads.completedGames, 0);
+      expect(ads.qaCanShow, isFalse);
+      ad.completion.complete();
+      await Future.wait([show, duplicate]);
+      expect(ads.completedGames, 0);
+      expect(ad.disposed, 1);
+      expect(diagnostics.value(AdQaField.show), 'Gösterim tamamlandı');
+    },
+  );
+
+  test(
+    'QA cannot load without consent or show after consent is revoked',
+    () async {
+      final backend = _Backend()..allowed = false;
+      final ads = _service(backend, qa: true);
+      await ads.start();
+      await ads.loadQaTestAd();
+      expect(backend.interstitialRequests, 0);
+      expect(ads.qaCanShow, isFalse);
+
+      final ad = _Interstitial();
+      backend.allowed = true;
+      backend.interstitial = ad;
+      final ready = _service(backend, qa: true);
+      await ready.start();
+      await _flush();
+      backend.allowed = false;
+      await ready.showQaTestAd(() => true);
+      expect(ad.shown, 0);
+      expect(ad.disposed, 1);
+    },
+  );
+
+  test('A disposed QA screen cannot present a late ad', () async {
+    final ad = _Interstitial();
+    final backend = _Backend()..pendingInterstitial = Future.value(ad);
+    final ads = _service(backend, qa: true);
+    await ads.start();
+    await _flush();
+    await ads.showQaTestAd(() => false);
+    expect(ad.shown, 0);
+  });
+
+  test(
+    'QA messages contain no raw identifiers and the event list is bounded',
+    () {
+      final safe = safeAdError(
+        'secret-domain-device-id',
+        7,
+        'Network error for person@example.com ca-app-pub-secret 192.168.1.1',
+      );
+      expect(safe, 'other / 7 / Ağ bağlantısı hatası');
+      final diagnostics = AdsDiagnostics();
+      for (var i = 0; i < 50; i++) {
+        diagnostics.event('event $i');
+      }
+      expect(diagnostics.events.length, 40);
+      diagnostics.dispose();
+      expect(() => diagnostics.event('late callback'), returnsNormally);
+    },
+  );
+
+  for (final qa in [false, true]) {
+    testWidgets('QA route and settings visibility are gated: $qa', (
+      tester,
+    ) async {
+      final diagnostics = qa ? AdsDiagnostics() : null;
+      if (diagnostics != null) addTearDown(diagnostics.dispose);
+      final ads = _service(_Backend(), qa: qa, diagnostics: diagnostics);
+      final container = ProviderContainer(
+        overrides: [
+          adsQaEnabledProvider.overrideWithValue(qa),
+          adsServiceProvider.overrideWithValue(ads),
+        ],
+      );
+      addTearDown(container.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const OynikaApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final router = container.read(appRouterProvider);
+      router.go('/settings');
+      await tester.pumpAndSettle();
+      final label = find.text('Reklam tanılama (QA)');
+      expect(label, qa ? findsOneWidget : findsNothing);
+      router.go('/qa/ads');
+      await tester.pumpAndSettle();
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        qa ? '/qa/ads' : '/settings',
+      );
+      if (qa) {
+        await tester.scrollUntilVisible(find.text('Test reklamını yükle'), 200);
+      }
+      expect(
+        find.text('Test reklamını yükle'),
+        qa ? findsOneWidget : findsNothing,
+      );
+      expect(
+        find.text('Test reklamını göster'),
+        qa ? findsOneWidget : findsNothing,
+      );
+      expect(tester.takeException(), isNull);
+    });
+  }
 }

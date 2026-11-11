@@ -15,13 +15,28 @@ class OynikaApp extends ConsumerStatefulWidget {
   ConsumerState<OynikaApp> createState() => _OynikaAppState();
 }
 
-class _OynikaAppState extends ConsumerState<OynikaApp> {
+class _OynikaAppState extends ConsumerState<OynikaApp>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) unawaited(ref.read(adsServiceProvider).start());
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(ref.read(adsServiceProvider).retryConsent(automatic: true));
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -31,14 +46,12 @@ class _OynikaAppState extends ConsumerState<OynikaApp> {
     theme: AppTheme.light,
     darkTheme: AppTheme.dark,
     themeMode: ref.watch(themeModeProvider),
-    builder:
-        (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
-          value:
-              Theme.of(context).brightness == Brightness.dark
-                  ? SystemUiOverlayStyle.light
-                  : SystemUiOverlayStyle.dark,
-          child: child!,
-        ),
+    builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+      value: Theme.of(context).brightness == Brightness.dark
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
+      child: child!,
+    ),
     routerConfig: ref.watch(appRouterProvider),
   );
 }

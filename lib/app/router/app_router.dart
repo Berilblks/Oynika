@@ -1,3 +1,5 @@
+import '../../core/ads/ads_diagnostics.dart';
+import '../../core/ads/ads_qa_screen.dart';
 import '../../features/games/undercover/presentation/undercover_setup_screen.dart';
 import '../../features/games/charades/presentation/charades_screen.dart';
 import '../../features/games/tabu/presentation/tabu_screen.dart';
@@ -16,9 +18,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final router = GoRouter(
     routes: [
       StatefulShellRoute.indexedStack(
-        builder:
-            (context, state, shell) =>
-                AppNavigationShell(navigationShell: shell),
+        builder: (context, state, shell) =>
+            AppNavigationShell(navigationShell: shell),
         branches: [
           StatefulShellBranch(
             routes: [
@@ -50,13 +51,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(
+        path: '/qa/ads',
+        redirect: (context, state) =>
+            ref.read(adsQaEnabledProvider) ? null : '/settings',
+        builder: (context, state) => const AdsQaScreen(),
+      ),
+      GoRoute(
         path: '/games/:game',
         name: 'game-intro',
-        redirect:
-            (context, state) =>
-                PartyGame.fromSlug(state.pathParameters['game']) == null
-                    ? '/games'
-                    : null,
+        redirect: (context, state) =>
+            PartyGame.fromSlug(state.pathParameters['game']) == null
+            ? '/games'
+            : null,
         builder: (context, state) {
           final game = PartyGame.fromSlug(state.pathParameters['game'])!;
           return switch (game) {
@@ -68,16 +74,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
     ],
-    errorBuilder:
-        (context, state) => Scaffold(
-          appBar: AppBar(title: const Text('Oynika')),
-          body: Center(
-            child: TextButton(
-              onPressed: () => context.go('/'),
-              child: const Text('Ana sayfaya dön'),
-            ),
-          ),
+    errorBuilder: (context, state) => Scaffold(
+      appBar: AppBar(title: const Text('Oynika')),
+      body: Center(
+        child: TextButton(
+          onPressed: () => context.go('/'),
+          child: const Text('Ana sayfaya dön'),
         ),
+      ),
+    ),
   );
   ref.onDispose(router.dispose);
   return router;

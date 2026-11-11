@@ -4,10 +4,11 @@ String? interstitialAdUnitFor(
   TargetPlatform platform, {
   required bool release,
   bool testMode = false,
+  bool qa = false,
   bool web = false,
 }) {
   if (web) return null;
-  final live = release && !testMode;
+  final live = release && !testMode && !qa;
   return switch (platform) {
     TargetPlatform.android =>
       live
@@ -20,3 +21,7 @@ String? interstitialAdUnitFor(
     _ => null,
   };
 }
+
+bool isGoogleTestInterstitialUnit(String? unit) =>
+    unit == 'ca-app-pub-3940256099942544/4411468910' ||
+    unit == 'ca-app-pub-3940256099942544/1033173712';
