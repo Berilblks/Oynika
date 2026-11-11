@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../games/domain/party_game.dart';
 import '../../../../app/theme/app_theme.dart';
 
 class PartyBanner extends StatelessWidget {
@@ -53,7 +52,7 @@ class PartyBanner extends StatelessWidget {
                   SizedBox(
                     width: constraints.maxWidth * .60,
                     child: Text(
-                      PartyGame.slogan,
+                      'Eğlence Bir Araya Getirir!',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: compact ? 25 : 28,

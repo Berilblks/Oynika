@@ -109,7 +109,7 @@ void main() {
       }
       container.read(appRouterProvider).go('/');
       await tester.pumpAndSettle();
-      expect(find.text('4 Oyun, Tek Uygulama!'), findsOneWidget);
+      expect(find.text('Eğlence Bir Araya Getirir!'), findsOneWidget);
       expect(find.text("Arkadaşlarınla eğlence Oynika'da!"), findsOneWidget);
       expect(PartyGame.whoAmI.isPlayable, isTrue);
       expect(PartyGame.values.where((game) => game.isPlayable), hasLength(4));
