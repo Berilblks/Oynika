@@ -14,8 +14,36 @@ const tabuCategories = [
   'Kültür',
   'Seyahat',
   'Nesneler',
+  'Yiyecek ve içecek',
+  'Hayvanlar ve doğa',
+  'Türkiye ve kültür',
+  'Spor ve eğlence',
+  'Duygular ve ilişkiler',
+  'Seyahat ve mekânlar',
+  'Deyimler ve popüler ifadeler',
 ];
 const tabuDifficulties = ['Kolay', 'Orta', 'Zor'];
+
+// Compare punctuation, spacing, Turkish letters and common accent variants
+// without changing the team-name normalization used by the games.
+String tabuWordKey(String value) {
+  var key = turkishKey(value);
+  for (final entry in const {
+    'ç': 'c',
+    'ğ': 'g',
+    'ı': 'i',
+    'ö': 'o',
+    'ş': 's',
+    'ü': 'u',
+    'â': 'a',
+    'î': 'i',
+    'û': 'u',
+    '\u0307': '',
+  }.entries) {
+    key = key.replaceAll(entry.key, entry.value);
+  }
+  return key.replaceAll(RegExp(r'[^a-z0-9]'), '');
+}
 
 class CardRepository {
   Future<List<TabuCard>> load() async =>
@@ -23,21 +51,20 @@ class CardRepository {
 
   static List<TabuCard> decode(String source) {
     final rows = jsonDecode(source) as List<dynamic>;
-    final cards =
-        rows
-            .map((row) => TabuCard.fromJson(row as Map<String, dynamic>))
-            .toList();
+    final cards = rows
+        .map((row) => TabuCard.fromJson(row as Map<String, dynamic>))
+        .toList();
     final ids = <String>{}, words = <String>{};
     for (final card in cards) {
-      final forbidden = card.forbidden.map(turkishKey).toSet();
+      final forbidden = card.forbidden.map(tabuWordKey).toSet();
       if (card.id.isEmpty ||
           !ids.add(card.id) ||
-          card.word.trim().isEmpty ||
-          !words.add(turkishKey(card.word)) ||
+          tabuWordKey(card.word).isEmpty ||
+          !words.add(tabuWordKey(card.word)) ||
           card.forbidden.length != 5 ||
           forbidden.length != 5 ||
           forbidden.contains('') ||
-          forbidden.contains(turkishKey(card.word)) ||
+          forbidden.contains(tabuWordKey(card.word)) ||
           !tabuCategories.contains(card.category) ||
           !tabuDifficulties.contains(card.difficulty)) {
         throw FormatException('Geçersiz Tabu kartı: ${card.id}');

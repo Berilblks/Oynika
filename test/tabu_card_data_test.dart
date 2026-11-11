@@ -17,16 +17,32 @@ void main() {
             File('test/fixtures/tabu_cards_phase3.json').readAsStringSync(),
           )
           as List;
-  final added = cards.skip(250).toList();
+  final added = cards.skip(250).take(250).toList();
+  final expansion = cards.skip(500).toList();
+  const expansionCounts = {
+    'Günlük yaşam': 90,
+    'Yiyecek ve içecek': 60,
+    'Meslekler': 40,
+    'Hayvanlar ve doğa': 50,
+    'Türkiye ve kültür': 50,
+    'Teknoloji': 40,
+    'Spor ve eğlence': 40,
+    'Duygular ve ilişkiler': 50,
+    'Seyahat ve mekânlar': 40,
+    'Deyimler ve popüler ifadeler': 40,
+  };
+  final legacyCategories = original
+      .map((row) => (row as Map)['category'] as String)
+      .toSet();
 
   test('İlk 250 kartın sırası ve bütün alanları Faz 3 ile aynı kalır', () {
     expect(original, hasLength(250));
     expect(rows.take(250).toList(), original);
     expect(added, hasLength(250));
-    expect(cards, hasLength(500));
+    expect(cards, hasLength(1000));
   });
 
-  test('500 kart mevcut şemaya ve sıralı benzersiz ID biçimine uyar', () {
+  test('1000 kart mevcut şemaya ve sıralı benzersiz ID biçimine uyar', () {
     const keys = {'id', 'word', 'forbidden', 'category', 'difficulty'};
     for (var i = 0; i < rows.length; i++) {
       final row = rows[i];
@@ -41,18 +57,18 @@ void main() {
       );
       expect(cards[i].id, 'tabu-${(i + 1).toString().padLeft(3, '0')}');
     }
-    expect(cards.map((card) => card.id).toSet(), hasLength(500));
+    expect(cards.map((card) => card.id).toSet(), hasLength(1000));
   });
 
   test('Hedefler Türkçe büyük/küçük harf normalleştirmesiyle benzersizdir', () {
     expect(turkishKey(' İSTANBUL '), turkishKey('istanbul'));
     expect(turkishKey('IŞIK'), turkishKey('ışık'));
-    expect(cards.map((card) => turkishKey(card.word)).toSet(), hasLength(500));
+    expect(cards.map((card) => turkishKey(card.word)).toSet(), hasLength(1000));
   });
 
   test('Her kartta tam beş dolu farklı yasaklı vardır ve hedef bulunmaz', () {
     for (final card in cards) {
-      final forbidden = card.forbidden.map(turkishKey).toList();
+      final forbidden = card.forbidden.map(tabuWordKey).toList();
       expect(forbidden, hasLength(5), reason: card.id);
       expect(
         forbidden.every((word) => word.isNotEmpty),
@@ -62,20 +78,26 @@ void main() {
       expect(forbidden.toSet(), hasLength(5), reason: card.id);
       expect(
         forbidden,
-        isNot(contains(turkishKey(card.word))),
+        isNot(contains(tabuWordKey(card.word))),
         reason: card.id,
       );
     }
   });
 
-  test('Toplamda kategori başına 50; kolay/orta/zor 300/160/40', () {
-    expect(cards.map((card) => card.category).toSet(), tabuCategories.toSet());
+  test('İlk 500 kartta eski kategori ve 300/160/40 dağılımı korunur', () {
+    expect(
+      cards.take(500).map((card) => card.category).toSet(),
+      legacyCategories,
+    );
     expect(
       cards.map((card) => card.difficulty).toSet(),
       tabuDifficulties.toSet(),
     );
-    for (final category in tabuCategories) {
-      final group = cards.where((card) => card.category == category).toList();
+    for (final category in legacyCategories) {
+      final group = cards
+          .take(500)
+          .where((card) => card.category == category)
+          .toList();
       expect(group, hasLength(50), reason: category);
       for (final entry in {'Kolay': 30, 'Orta': 16, 'Zor': 4}.entries) {
         expect(
@@ -87,16 +109,16 @@ void main() {
     }
     for (final entry in {'Kolay': 300, 'Orta': 160, 'Zor': 40}.entries) {
       expect(
-        cards.where((card) => card.difficulty == entry.key),
+        cards.take(500).where((card) => card.difficulty == entry.key),
         hasLength(entry.value),
       );
     }
   });
 
   test(
-    'Yeni 250 kartta kategori başına 25 ve 15/8/2 zorluk dağılımı vardır',
+    'Faz 3.1 kartlarında kategori başına 25 ve 15/8/2 zorluk dağılımı vardır',
     () {
-      for (final category in tabuCategories) {
+      for (final category in legacyCategories) {
         final group = added.where((card) => card.category == category).toList();
         expect(group, hasLength(25), reason: category);
         for (final entry in {'Kolay': 15, 'Orta': 8, 'Zor': 2}.entries) {
@@ -106,6 +128,173 @@ void main() {
             reason: '$category/${entry.key}',
           );
         }
+      }
+    },
+  );
+
+  test(
+    'Eski 500 kart yalnızca doğrulanmış Ön yargı yazım düzeltmesiyle korunur',
+    () {
+      final legacy =
+          (jsonDecode(
+                    File(
+                      'test/fixtures/tabu_cards_500.json',
+                    ).readAsStringSync(),
+                  )
+                  as List)
+              .cast<Map<String, dynamic>>();
+      expect(legacy, hasLength(500));
+      expect(legacy[274]['word'], 'Önyargı');
+      legacy[274]['word'] = 'Ön yargı';
+      expect(rows.take(500).toList(), legacy);
+      expect(expansion, hasLength(500));
+    },
+  );
+
+  test(
+    'Yeni 500 kartın on kategori kotası ve 200/225/75 dağılımı doğrudur',
+    () {
+      expect(
+        expansion.map((card) => card.category).toSet(),
+        expansionCounts.keys.toSet(),
+      );
+      for (final entry in expansionCounts.entries) {
+        expect(
+          expansion.where((card) => card.category == entry.key),
+          hasLength(entry.value),
+          reason: entry.key,
+        );
+      }
+      for (final entry in {'Kolay': 200, 'Orta': 225, 'Zor': 75}.entries) {
+        expect(
+          expansion.where((card) => card.difficulty == entry.key),
+          hasLength(entry.value),
+          reason: entry.key,
+        );
+      }
+      expect(
+        cards.map((card) => card.category).toSet(),
+        tabuCategories.toSet(),
+      );
+      expect(tabuCategories, hasLength(17));
+    },
+  );
+
+  test(
+    'Türkçe harf, boşluk, noktalama ve düzeltme işareti farkları tekrar oluşturmaz',
+    () {
+      expect(tabuWordKey('İŞ GÖRÜŞMESİ!'), tabuWordKey('is-gorusmesi'));
+      expect(tabuWordKey('Öz güven'), tabuWordKey('Özgüven'));
+      expect(tabuWordKey('KÂĞIT'), tabuWordKey('kagit'));
+      expect(
+        cards.map((card) => tabuWordKey(card.word)).toSet(),
+        hasLength(1000),
+      );
+      final first = Map<String, dynamic>.from(rows.first);
+      for (final variant in ['KAHVALTI', 'kahvalti!', 'Kah-val-tı']) {
+        final duplicate = {...first, 'id': 'duplicate', 'word': variant};
+        expect(
+          () => CardRepository.decode(jsonEncode([first, duplicate])),
+          throwsFormatException,
+        );
+      }
+    },
+  );
+
+  test(
+    'Yeni hedefler kendi basit çekimli biçimlerini yasaklı olarak içermez',
+    () {
+      const suffixes = [
+        'ı',
+        'i',
+        'u',
+        'ü',
+        'a',
+        'e',
+        'da',
+        'de',
+        'ta',
+        'te',
+        'dan',
+        'den',
+        'tan',
+        'ten',
+        'lar',
+        'ler',
+        'ın',
+        'in',
+        'un',
+        'ün',
+        'nın',
+        'nin',
+        'nun',
+        'nün',
+        'sı',
+        'si',
+        'su',
+        'sü',
+        'yı',
+        'yi',
+        'yu',
+        'yü',
+        'ya',
+        'ye',
+        'ları',
+        'leri',
+      ];
+      for (final card in expansion) {
+        final target = turkishKey(card.word);
+        final stems = <String>{target};
+        const softening = {'p': 'b', 'ç': 'c', 't': 'd', 'k': 'ğ'};
+        if (softening.containsKey(target[target.length - 1])) {
+          stems.add(
+            target.substring(0, target.length - 1) +
+                softening[target[target.length - 1]]!,
+          );
+        }
+        final forms = <String>{
+          target,
+          for (final stem in stems)
+            for (final suffix in suffixes) stem + suffix,
+        };
+        for (final forbidden in card.forbidden) {
+          expect(
+            forms,
+            isNot(contains(turkishKey(forbidden))),
+            reason: '${card.id}: ${card.word}/$forbidden',
+          );
+        }
+      }
+    },
+  );
+
+  test(
+    'İncelenen eş anlamlı ve yabancı ad alternatifleri ayrı hedefler değildir',
+    () {
+      final targets = cards.map((card) => tabuWordKey(card.word)).toSet();
+      for (final aliases in [
+        ['Volkan', 'Yanardağ'],
+        ['Valiz', 'Bavul'],
+        ['Nehir', 'Irmak'],
+        ['Sahil', 'Kıyı'],
+        ['Şifre', 'Parola'],
+        ['Ön yargı', 'Peşin hüküm'],
+        ['Sportmenlik', 'Fair play'],
+        ['Kahve', 'Türk kahvesi'],
+        ['İstenmeyen ileti', 'Spam', 'Çöp e-posta'],
+        ['Taşınabilir şarj cihazı', 'Powerbank'],
+        ['Özçekim', 'Selfie'],
+        ['Ayakkabıcı', 'Kunduracı'],
+        ['Ateş ölçer', 'Termometre'],
+        ['Kablosuz ağ', 'Wi-Fi'],
+        ['İnsansız hava aracı', 'Drone'],
+        ['Karekod', 'QR kod'],
+      ]) {
+        expect(
+          aliases.map(tabuWordKey).where(targets.contains),
+          hasLength(1),
+          reason: aliases.join('/'),
+        );
       }
     },
   );
@@ -142,7 +331,7 @@ void main() {
   );
 
   test(
-    '500 kart gösterilmeden tekrar yok; takım değişiminde deste korunur ve bitince yenilenir',
+    '1000 kart gösterilmeden tekrar yok; takım değişiminde deste korunur ve bitince yenilenir',
     () {
       var now = Duration.zero;
       final container = ProviderContainer(
@@ -163,11 +352,11 @@ void main() {
       );
       controller.startRound();
       final seen = <String>{};
-      for (var i = 0; i < 500; i++) {
+      for (var i = 0; i < 1000; i++) {
         final current = state().card!.id;
         expect(seen.add(current), isTrue, reason: 'Kart ${i + 1}: $current');
         now += const Duration(milliseconds: 400);
-        if ((i + 1) % 100 == 0 && i != 499) {
+        if ((i + 1) % 100 == 0 && i != 999) {
           now += const Duration(seconds: 120);
           controller.tick();
           controller.nextRound();
@@ -176,9 +365,9 @@ void main() {
         } else {
           controller.answer(current, CardOutcome.taboo);
         }
-        if (i == 499) expect(state().card!.id, isNot(current));
+        if (i == 999) expect(state().card!.id, isNot(current));
       }
-      expect(seen, hasLength(500));
+      expect(seen, hasLength(1000));
       expect(state().deckCycle, 1);
       expect(state().phase, GamePhase.playing);
       expect(state().winner, isNull);

@@ -2,7 +2,7 @@
 
 Arkadaş ortamlarında oynanan dört parti oyununu bir araya getiren, Türkçe ve çevrimdışı Flutter uygulaması. Backend, üyelik ve giriş sistemi yoktur.
 
-Faz 1 altyapısı tamamlandı. **Faz 2** onaylanan ana ekran tasarımını, oyun tanıtımlarını, alt navigasyonu ve tema seçimini içerir. **Faz 3** ile Tabu oynanabilir durumdadır; 500 çevrimdışı Türkçe kart içerir. Faz 4 ile Sessiz Sinema da 300 film ve 200 dizi kartıyla oynanabilir. Faz 5 ile Aramızdaki Casus da oynanabilir. Ben Kimim? Faz 6.3.1 ile 300 kart, gerçek tur, sayaç ve dokunmatik Doğru/Pas kontrolleriyle oynanabilir.
+Faz 1 altyapısı tamamlandı. **Faz 2** onaylanan ana ekran tasarımını, oyun tanıtımlarını, alt navigasyonu ve tema seçimini içerir. **Faz 3** ile Tabu oynanabilir durumdadır; 1.000 çevrimdışı Türkçe kart içerir. Faz 4 ile Sessiz Sinema da 300 film ve 200 dizi kartıyla oynanabilir. Faz 5 ile Aramızdaki Casus da oynanabilir. Ben Kimim? Faz 6.3.1 ile 300 kart, gerçek tur, sayaç ve dokunmatik Doğru/Pas kontrolleriyle oynanabilir.
 
 ## Teknolojiler
 
@@ -212,3 +212,7 @@ Ben Kimim? artık varsayılan 20 hedef puanıyla oynanır; bütün oyuncular nor
 ## Faz 6.5 — kalite kontrolü ve iOS hazırlığı
 
 Gecikmiş/çift arayüz çağrılarına karşı korumalar, iOS yön ipucu düzeltmesi ve CocoaPods hazırlığı tamamlandı. Onaylanan sensör eşikleri ve tasarım korundu. [Kalite raporu ve Mac/Xcode kontrol listesi](docs/who_phase65.md).
+
+## Tabu — 1.000 kartlık güncel havuz
+
+Mevcut 500 karta 500 özgün kart eklendi. Eski kategori etiketleri korunur; yeni kartlar istenen 10 kategoriye ayrılır. Yeni kartların zorluk dağılımı %40 kolay, %45 orta, %15 zordur. Bir önceki havuzda yalnızca “Önyargı” yazımı “Ön yargı” olarak düzeltildi. Dağılım, kalite kontrolü ve doğrulama sonuçları: [1.000 kart raporu](docs/tabu_1000_cards.md). Önceki faz raporları tarihsel sonuçları içerir.

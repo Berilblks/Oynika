@@ -259,14 +259,13 @@ void main() {
     );
   });
 
-  test('500 özgün kart, 10 kategori ve doğru zorluk dağılımı', () {
-    expect(cards.length, 500);
-    for (final category in tabuCategories) {
-      expect(cards.where((c) => c.category == category).length, 50);
-    }
-    expect(cards.where((c) => c.difficulty == 'Kolay').length, 300);
-    expect(cards.where((c) => c.difficulty == 'Orta').length, 160);
-    expect(cards.where((c) => c.difficulty == 'Zor').length, 40);
+  test('1000 özgün kart, 17 kategori ve doğru zorluk dağılımı', () {
+    expect(cards.length, 1000);
+    expect(cards.map((c) => c.category).toSet(), tabuCategories.toSet());
+    expect(tabuCategories, hasLength(17));
+    expect(cards.where((c) => c.difficulty == 'Kolay').length, 500);
+    expect(cards.where((c) => c.difficulty == 'Orta').length, 385);
+    expect(cards.where((c) => c.difficulty == 'Zor').length, 115);
     expect(cards.every((c) => c.forbidden.length == 5), isTrue);
   });
   test('Bozuk JSON kartları reddedilir', () {
@@ -314,12 +313,11 @@ void main() {
       throwsArgumentError,
     ),
   );
-  for (final entry
-      in {
-        CardOutcome.correct: 1,
-        CardOutcome.taboo: -1,
-        CardOutcome.pass: 0,
-      }.entries) {
+  for (final entry in {
+    CardOutcome.correct: 1,
+    CardOutcome.taboo: -1,
+    CardOutcome.pass: 0,
+  }.entries) {
     test('${entry.key} puanı ${entry.value}', () {
       setup();
       controller.startRound();
