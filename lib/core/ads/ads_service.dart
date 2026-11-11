@@ -305,8 +305,7 @@ class AdsService {
 
     final count = _completions[result];
     final ad = _interstitial;
-    final eligible =
-        count != null && count % 2 == 0 && _adOpportunityUsed[result] != true;
+    final eligible = count != null && _adOpportunityUsed[result] != true;
     _adOpportunityUsed[result] = true;
     if (!_status.value.ready || !eligible || ad == null) {
       diagnostics?.set(

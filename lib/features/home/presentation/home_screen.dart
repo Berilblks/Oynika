@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../games/domain/party_game.dart';
 
 import '../../../core/constants/app_dimensions.dart';
@@ -7,26 +8,8 @@ import '../../../shared/widgets/section_heading.dart';
 import 'widgets/home_header.dart';
 import 'widgets/party_banner.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final _gamesKey = GlobalKey();
-
-  void _exploreGames() {
-    final target = _gamesKey.currentContext;
-    if (target != null) {
-      Scrollable.ensureVisible(
-        target,
-        duration: const Duration(milliseconds: 550),
-        curve: Curves.easeInOutCubic,
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,12 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 170,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color:
-                          theme.brightness == Brightness.dark
-                              ? theme.colorScheme.primary.withValues(
-                                alpha: 0.06,
-                              )
-                              : const Color(0xFFFFE9CD).withValues(alpha: 0.65),
+                      color: theme.brightness == Brightness.dark
+                          ? theme.colorScheme.primary.withValues(alpha: 0.06)
+                          : const Color(0xFFFFE9CD).withValues(alpha: 0.65),
                       borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(100),
                         bottomRight: Radius.circular(55),
@@ -77,10 +57,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: HomeHeader(),
                     ),
                     const SizedBox(height: 20),
-                    PartyBanner(onExplore: _exploreGames),
+                    PartyBanner(onExplore: () => context.go('/games')),
                     const SizedBox(height: 10),
                     SectionHeading(
-                      key: _gamesKey,
                       title: 'Oyunlar',
                       trailing: Container(
                         padding: const EdgeInsets.symmetric(

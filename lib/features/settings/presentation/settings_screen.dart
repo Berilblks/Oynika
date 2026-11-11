@@ -7,16 +7,39 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/theme/theme_mode_provider.dart';
 import '../../../core/ads/google_ads_backend.dart';
 import '../../../core/constants/app_dimensions.dart';
+import '../../../core/constants/app_links.dart';
+import '../../../core/utils/app_package_info.dart';
+import '../../../core/utils/external_links.dart';
 import '../../../shared/widgets/section_heading.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
+
+  Future<void> _openLink(
+    BuildContext context,
+    WidgetRef ref,
+    Uri uri,
+    String errorMessage,
+  ) async {
+    try {
+      if (await ref.read(externalLinkOpenerProvider)(uri)) return;
+    } catch (_) {
+      // Missing handlers and platform errors must not interrupt settings.
+    }
+    if (context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(errorMessage)));
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final selectedMode = ref.watch(themeModeProvider);
     final ads = ref.watch(adsServiceProvider);
+    final packageInfo = ref.watch(appPackageInfoProvider);
+    final version = packageInfo.asData?.value;
     return SafeArea(
       bottom: false,
       child: SingleChildScrollView(
@@ -90,42 +113,44 @@ class SettingsScreen extends ConsumerWidget {
                   style: theme.textTheme.bodySmall,
                 ),
                 const SizedBox(height: 28),
-                Text('Oynika hakkında', style: theme.textTheme.titleLarge),
+                Text('Gizlilik ve Yasal', style: theme.textTheme.titleLarge),
                 const SizedBox(height: 12),
-                Text(
-                  PartyGame.slogan,
-                  style: TextStyle(fontWeight: FontWeight.w800),
+                Material(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(20),
+                  clipBehavior: Clip.antiAlias,
+                  child: ListTile(
+                    key: const ValueKey('privacy-policy'),
+                    leading: const Icon(Icons.policy_outlined),
+                    title: const Text('Gizlilik Politikası'),
+                    trailing: const Icon(Icons.open_in_new_rounded, size: 20),
+                    onTap: () => _openLink(
+                      context,
+                      ref,
+                      AppLinks.privacyTr,
+                      'Gizlilik politikası açılamadı. Lütfen tekrar dene.',
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  'Oynika, arkadaşlarınla oynayabileceğin ${PartyGame.values.length} eğlenceli parti oyununu tek uygulamada buluşturur. Türkçe, çevrimdışı ve hesapsız.',
-                ),
-                const SizedBox(height: 12),
-                Text(PartyGame.availabilityMessage),
-                const SizedBox(height: 24),
-                Text(
-                  'Sürüm 0.1.0+1 • V1 hazırlığı',
-                  key: const ValueKey('app-version'),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                Material(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(20),
+                  clipBehavior: Clip.antiAlias,
+                  child: ListTile(
+                    key: const ValueKey('support-contact'),
+                    leading: const Icon(Icons.mail_outline_rounded),
+                    title: const Text('Destek ve İletişim'),
+                    subtitle: const Text(AppLinks.supportEmail),
+                    onTap: () => _openLink(
+                      context,
+                      ref,
+                      AppLinks.support,
+                      'E-posta uygulaması açılamadı. '
+                      '${AppLinks.supportEmail} adresine yazabilirsin.',
+                    ),
                   ),
                 ),
-                const SizedBox(height: 24),
-                TextButton.icon(
-                  onPressed: () => showLicensePage(
-                    context: context,
-                    applicationName: 'Oynika',
-                    applicationVersion: '0.1.0+1',
-                  ),
-                  icon: const Icon(Icons.description_outlined),
-                  label: const Text('Açık kaynak lisansları'),
-                ),
-                if (ref.watch(adsQaEnabledProvider))
-                  TextButton.icon(
-                    icon: const Icon(Icons.bug_report_outlined),
-                    label: const Text('Reklam tanılama (QA)'),
-                    onPressed: () => context.push('/qa/ads'),
-                  ),
                 ValueListenableBuilder(
                   valueListenable: ads.status,
                   builder: (context, status, _) => status.privacyOptions
@@ -150,6 +175,47 @@ class SettingsScreen extends ConsumerWidget {
                         )
                       : const SizedBox.shrink(),
                 ),
+                const SizedBox(height: 28),
+                Text('Oynika hakkında', style: theme.textTheme.titleLarge),
+                const SizedBox(height: 12),
+                Text(
+                  PartyGame.slogan,
+                  style: TextStyle(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 8),
+                Text(PartyGame.aboutDescription),
+                const SizedBox(height: 12),
+                Text(PartyGame.availabilityMessage),
+                const SizedBox(height: 24),
+                Text(
+                  packageInfo.when(
+                    data: (info) => 'Sürüm ${packageVersionLabel(info)}',
+                    loading: () => 'Sürüm bilgisi yükleniyor…',
+                    error: (_, _) => 'Sürüm bilgisi alınamadı.',
+                  ),
+                  key: const ValueKey('app-version'),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                TextButton.icon(
+                  onPressed: () => showLicensePage(
+                    context: context,
+                    applicationName: 'Oynika',
+                    applicationVersion: version == null
+                        ? null
+                        : packageVersionLabel(version),
+                  ),
+                  icon: const Icon(Icons.description_outlined),
+                  label: const Text('Açık kaynak lisansları'),
+                ),
+                if (ref.watch(adsQaEnabledProvider))
+                  TextButton.icon(
+                    icon: const Icon(Icons.bug_report_outlined),
+                    label: const Text('Reklam tanılama (QA)'),
+                    onPressed: () => context.push('/qa/ads'),
+                  ),
               ],
             ),
           ),

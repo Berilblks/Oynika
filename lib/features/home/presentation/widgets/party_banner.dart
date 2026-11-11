@@ -11,7 +11,7 @@ class PartyBanner extends StatelessWidget {
     builder: (context, constraints) {
       final scale = MediaQuery.textScalerOf(context).scale(1);
       final compact = constraints.maxWidth < 350;
-      final height = (compact ? 220.0 : 200.0) + (scale - 1).clamp(0, 3) * 160;
+      final height = 220.0 + (scale - 1).clamp(0, 3) * 160;
       return SizedBox(
         height: height,
         child: Stack(
@@ -30,10 +30,12 @@ class PartyBanner extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned.fill(child: CustomPaint(painter: _PartyWavePainter())),
+            Positioned.fill(
+              child: CustomPaint(painter: _PartyWavePainter(textScale: scale)),
+            ),
             Positioned(
               left: 24,
-              top: 40,
+              top: 56,
               right: 22,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,16 +52,23 @@ class PartyBanner extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   SizedBox(
-                    width: constraints.maxWidth * .60,
-                    child: Text(
-                      'Eğlence Bir Araya Getirir!',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: compact ? 25 : 28,
-                        fontWeight: FontWeight.w900,
-                        fontVariations: AppTheme.displayWeight,
-                        height: 1.08,
-                        letterSpacing: -0.6,
+                    width: constraints.maxWidth - 46,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Eğlence\nBir Araya Getirir!',
+                        key: const ValueKey('home-hero-slogan'),
+                        maxLines: 2,
+                        softWrap: false,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: compact ? 25 : 28,
+                          fontWeight: FontWeight.w900,
+                          fontVariations: AppTheme.displayWeight,
+                          height: 1.08,
+                          letterSpacing: -0.6,
+                        ),
                       ),
                     ),
                   ),
@@ -111,30 +120,43 @@ class PartyBanner extends StatelessWidget {
 }
 
 class _PartyWavePainter extends CustomPainter {
+  const _PartyWavePainter({required this.textScale});
+
+  final double textScale;
+
   @override
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    final path =
-        Path()
-          ..moveTo(0, h * 0.38)
-          ..cubicTo(0, -h * 0.08, w * 0.20, 0, w * 0.35, h * 0.06)
-          ..cubicTo(w * 0.58, h * 0.11, w * 0.49, h * 0.43, w * 0.77, h * 0.43)
-          ..cubicTo(w * 0.94, h * 0.36, w, h * 0.51, w, h * 0.68)
-          ..cubicTo(w, h * 1.04, w * 0.92, h * 0.96, w * 0.70, h * 0.96)
-          ..cubicTo(w * 0.45, h * 0.93, w * 0.12, h * 1.08, w * 0.04, h * 0.85)
-          ..cubicTo(w * 0.01, h * 0.77, 0, h * 0.57, 0, h * 0.38)
-          ..close();
-    final paint =
-        Paint()
-          ..shader = const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF5840B2), Color(0xFF382579)],
-          ).createShader(Offset.zero & size);
+    // Extra accessibility height belongs below the header; do not stretch the
+    // upper wave behind the two-line title into a transparent cutout.
+    final topH = h.clamp(0.0, 220.0) / textScale.clamp(1.0, 2.5);
+    final path = Path()
+      ..moveTo(0, topH * 0.38)
+      ..cubicTo(0, -topH * 0.08, w * 0.20, 0, w * 0.35, topH * 0.06)
+      ..cubicTo(
+        w * 0.58,
+        topH * 0.11,
+        w * 0.49,
+        topH * 0.43,
+        w * 0.77,
+        topH * 0.43,
+      )
+      ..cubicTo(w * 0.94, topH * 0.36, w, topH * 0.51, w, h * 0.68)
+      ..cubicTo(w, h * 1.04, w * 0.92, h * 0.96, w * 0.70, h * 0.96)
+      ..cubicTo(w * 0.45, h * 0.93, w * 0.12, h * 1.08, w * 0.04, h * 0.85)
+      ..cubicTo(w * 0.01, h * 0.77, 0, topH * 0.57, 0, topH * 0.38)
+      ..close();
+    final paint = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFF5840B2), Color(0xFF382579)],
+      ).createShader(Offset.zero & size);
     canvas.drawPath(path, paint);
   }
 
   @override
-  bool shouldRepaint(_PartyWavePainter oldDelegate) => false;
+  bool shouldRepaint(_PartyWavePainter oldDelegate) =>
+      oldDelegate.textScale != textScale;
 }

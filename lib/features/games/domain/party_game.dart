@@ -78,7 +78,17 @@ enum PartyGame {
   final Color accent;
   final List<String> instructions;
 
-  static String get slogan => '${values.length} Oyun, Tek Uygulama!';
+  static const slogan = 'Eğlence Bir Araya Getirir!';
+  static String get aboutDescription {
+    final titles = values.map((game) => game.title).toList();
+    final games = titles.length < 2
+        ? titles.join()
+        : '${titles.take(titles.length - 1).join(', ')} ve ${titles.last}';
+    return 'Oynika, arkadaşların ve ailenle birlikte keyifli vakit geçirmen için '
+        'hazırlanmış Türkçe parti oyunları uygulamasıdır. '
+        '$games ile eğlenceye katıl!';
+  }
+
   static const supportingText = "Arkadaşlarınla eğlence Oynika'da!";
   static String get availabilityMessage {
     final ready = values

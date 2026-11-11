@@ -95,8 +95,9 @@ void main() {
       for (final path in ['/', '/games']) {
         container.read(appRouterProvider).go(path);
         await tester.pumpAndSettle();
-        final cards =
-            tester.widgetList<GameCard>(find.byType(GameCard)).toList();
+        final cards = tester
+            .widgetList<GameCard>(find.byType(GameCard))
+            .toList();
         expect(cards, hasLength(4));
         expect(cards.map((card) => card.game.title), titles);
         expect(cards.map((card) => card.game.description), descriptions);
@@ -109,7 +110,7 @@ void main() {
       }
       container.read(appRouterProvider).go('/');
       await tester.pumpAndSettle();
-      expect(find.text('Eğlence Bir Araya Getirir!'), findsOneWidget);
+      expect(find.text('Eğlence\nBir Araya Getirir!'), findsOneWidget);
       expect(find.text("Arkadaşlarınla eğlence Oynika'da!"), findsOneWidget);
       expect(PartyGame.whoAmI.isPlayable, isTrue);
       expect(PartyGame.values.where((game) => game.isPlayable), hasLength(4));
@@ -215,15 +216,31 @@ void main() {
     );
   });
 
-  testWidgets('Karşılama oku oyunlar bölümüne kaydırır', (tester) async {
-    await openApp(tester, size: const Size(393, 650));
-    final card = find.byKey(const ValueKey('game-card-taboo'));
-    final before = tester.getTopLeft(card).dy;
-    await tester.tap(find.byKey(const ValueKey('explore-games')));
-    await tester.pumpAndSettle();
-    expect(tester.getTopLeft(card).dy, lessThan(before));
-    expect(tester.takeException(), isNull);
-  });
+  testWidgets(
+    'Karşılama oku mevcut Oyunlar sekmesini seçer ve geri dönülebilir',
+    (tester) async {
+      final container = await openApp(tester, size: const Size(393, 650));
+      await tester.tap(find.byKey(const ValueKey('explore-games')));
+      await tester.pumpAndSettle();
+      expect(container.read(appRouterProvider).state.uri.path, '/games');
+      expect(
+        tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
+        1,
+      );
+      await tapVisible(tester, find.byKey(const ValueKey('game-card-taboo')));
+      await tester.tap(find.byTooltip('Geri'));
+      await tester.pumpAndSettle();
+      expect(container.read(appRouterProvider).state.uri.path, '/games');
+      await tester.tap(find.byKey(const ValueKey('nav-home')));
+      await tester.pumpAndSettle();
+      expect(container.read(appRouterProvider).state.uri.path, '/');
+      expect(
+        tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex,
+        0,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('Geçersiz oyun rotası oyun listesine yönlenir', (tester) async {
     final container = await openApp(tester);
@@ -380,12 +397,11 @@ void main() {
         controller.reveal(id);
         controller.next(id);
       }
-      final spy =
-          container
-              .read(undercoverSessionProvider)!
-              .players
-              .firstWhere((p) => p.role == UndercoverRole.spy)
-              .id;
+      final spy = container
+          .read(undercoverSessionProvider)!
+          .players
+          .firstWhere((p) => p.role == UndercoverRole.spy)
+          .id;
       controller.beginVoting(container.read(undercoverSessionProvider)!.round!);
       while (container.read(undercoverSessionProvider)!.phase ==
           UndercoverPhase.voting) {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:oynika/app/app.dart';
+import 'package:oynika/app/launch_splash.dart';
 import 'package:oynika/app/router/app_router.dart';
 import 'package:oynika/core/ads/ad_units.dart';
 import 'package:oynika/core/ads/ads_diagnostics.dart';
@@ -118,7 +119,9 @@ void main() {
         ),
       ];
       final ad = _Interstitial();
-      final ads = _service(_Backend()..interstitial = ad);
+      final nextAd = _Interstitial();
+      final backend = _Backend()..interstitial = ad;
+      final ads = _service(backend);
       var now = Duration.zero;
       final container = ProviderContainer(
         overrides: [
@@ -168,9 +171,13 @@ void main() {
       expect(ad.shown, 0);
       await tester.tap(find.text('Tekrar Oyna'));
       await tester.pumpAndSettle();
-      expect(container.read(tabuGameProvider).phase, GamePhase.preRound);
+      expect(container.read(tabuGameProvider).phase, GamePhase.result);
       expect(ads.completedGames, 1);
-      expect(ad.shown, 0);
+      expect(ad.shown, 1);
+      backend.interstitial = nextAd;
+      ad.completion.complete();
+      await tester.pumpAndSettle();
+      expect(container.read(tabuGameProvider).phase, GamePhase.preRound);
 
       router.go('/games/charades');
       await tester.pumpAndSettle();
@@ -197,15 +204,16 @@ void main() {
       }
       await tester.pumpAndSettle();
       expect(ads.completedGames, 2);
-      expect(ad.shown, 0);
+      expect(nextAd.shown, 0);
       await tester.tap(find.text('Tekrar Oyna'));
       await tester.pumpAndSettle();
-      expect(ad.shown, 1);
+      expect(nextAd.shown, 1);
       expect(container.read(charadesGameProvider).phase, GamePhase.result);
-      ad.completion.complete();
+      nextAd.completion.complete();
       await tester.pumpAndSettle();
       expect(container.read(charadesGameProvider).phase, GamePhase.preRound);
       expect(ad.disposed, 1);
+      expect(nextAd.disposed, 1);
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );
@@ -314,68 +322,102 @@ void main() {
   });
 
   test(
-    'Count terminal identity once and show only on each second departure',
+    'Every completed game has one exit opportunity, including the first',
     () async {
-      final second = _Interstitial();
-      final fourth = _Interstitial();
-      final backend = _Backend()..interstitial = second;
+      var ad = _Interstitial();
+      final backend = _Backend()..interstitial = ad;
       final ads = _service(backend);
       await ads.start();
       await _flush();
       var exits = 0;
-      void exit() => exits++;
-
-      // A cancelled or stale attempt never adds an unfinished result.
-      ads.leaveResult(Object(), () => false, exit);
+      ads.leaveResult(Object(), () => false, () => exits++);
       expect(ads.completedGames, 0);
-      final first = Object();
-      ads.recordCompletion(first);
-      ads.recordCompletion(first);
-      ads.leaveResult(first, () => true, exit);
-      ads.leaveResult(first, () => true, exit);
-      expect(exits, 1);
-      expect(second.shown, 0);
-
-      final result = Object();
-      ads.recordCompletion(result);
-      expect(second.shown, 0);
-      ads.leaveResult(result, () => true, exit);
-      ads.leaveResult(result, () => true, exit);
-      await _flush();
-      expect(second.shown, 1);
-      expect(exits, 1);
-      backend.interstitial = fourth;
-      second.completion.complete();
-      await _flush();
-      expect(exits, 2);
-      expect(second.disposed, 1);
-
-      // Replays are new completions only when their own terminal state arrives.
-      ads.leaveResult(Object(), () => true, exit);
-      ads.leaveResult(Object(), () => true, exit);
-      await _flush();
-      expect(fourth.shown, 1);
-      expect(exits, 3);
-      fourth.completion.completeError(StateError('show failed'));
-      await _flush();
-      expect(exits, 4);
-      expect(fourth.disposed, 1);
+      for (var i = 0; i < 4; i++) {
+        final result = Object();
+        ads.recordCompletion(result);
+        ads.recordCompletion(result);
+        expect(ads.completedGames, i + 1);
+        expect(ad.shown, 0); // Merely opening results never shows an ad.
+        ads.leaveResult(result, () => true, () => exits++);
+        ads.leaveResult(result, () => true, () => exits++);
+        await _flush();
+        expect(ad.shown, 1);
+        expect(exits, i);
+        final next = _Interstitial();
+        backend.interstitial = next;
+        if (i == 3) {
+          ad.completion.completeError(StateError('show failed'));
+        } else {
+          ad.completion.complete();
+        }
+        await _flush();
+        expect(exits, i + 1);
+        expect(ad.disposed, 1);
+        ads.leaveResult(result, () => true, () => exits++);
+        expect(exits, i + 1);
+        ad = next;
+      }
       expect(ads.completedGames, 4);
     },
   );
 
   test(
-    'No loaded interstitial means immediate navigation even on game two',
+    'No loaded ad means immediate navigation on first and later games',
     () async {
       final ads = _service(_Backend());
       await ads.start();
       await _flush();
-      ads.recordCompletion(Object());
-      final second = Object();
+      for (var i = 1; i <= 3; i++) {
+        var exited = false;
+        ads.leaveResult(Object(), () => true, () => exited = true);
+        expect(exited, isTrue);
+        expect(ads.completedGames, i);
+        await _flush();
+      }
+    },
+  );
+
+  test('A retry of the same result cannot consume a second ad', () async {
+    final ad = _Interstitial();
+    final next = _Interstitial();
+    final backend = _Backend()..interstitial = ad;
+    final ads = _service(backend);
+    await ads.start();
+    await _flush();
+    final result = Object();
+    var exits = 0;
+    Future<void> leave() async {
+      exits++;
+    }
+
+    ads.leaveResult(result, () => true, leave);
+    await _flush();
+    backend.interstitial = next;
+    ad.completion.complete();
+    await _flush();
+    ads.leaveResult(result, () => true, leave);
+    await _flush();
+    expect(exits, 2);
+    expect(ads.completedGames, 1);
+    expect(ad.shown, 1);
+    expect(next.shown, 0);
+  });
+
+  test(
+    'Normal result exit rechecks UMP before presenting a loaded ad',
+    () async {
+      final ad = _Interstitial();
+      final backend = _Backend()..interstitial = ad;
+      final ads = _service(backend);
+      await ads.start();
+      await _flush();
+      backend.allowed = false;
       var exited = false;
-      ads.leaveResult(second, () => true, () => exited = true);
+      ads.leaveResult(Object(), () => true, () => exited = true);
+      await _flush();
+      expect(ad.shown, 0);
+      expect(ad.disposed, 1);
       expect(exited, isTrue);
-      expect(ads.completedGames, 2);
     },
   );
 
@@ -397,6 +439,42 @@ void main() {
       await _flush();
       expect(navigations, 0);
       expect(fullscreen.disposed, 1);
+    },
+  );
+
+  testWidgets(
+    'Splash completes without waiting for UMP and never returns on resume',
+    (tester) async {
+      final backend = _Backend()..pendingUpdate = Completer<void>();
+      final ads = _service(backend);
+      final container = ProviderContainer(
+        overrides: [adsServiceProvider.overrideWithValue(ads)],
+      );
+      addTearDown(container.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const OynikaApp(),
+        ),
+      );
+      expect(find.byKey(const ValueKey('launch-splash')), findsOneWidget);
+      expect(backend.updates, 0);
+      await tester.pump(LaunchSplash.duration);
+      await tester.pump(const Duration(milliseconds: 1));
+      expect(find.byKey(const ValueKey('launch-splash')), findsNothing);
+      expect(backend.updates, 1);
+      expect(ads.status.value.busy, isTrue);
+      await tester.tap(find.byKey(const ValueKey('explore-games')));
+      await tester.pumpAndSettle();
+      expect(container.read(appRouterProvider).state.uri.path, '/games');
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump();
+      expect(find.byKey(const ValueKey('launch-splash')), findsNothing);
+      expect(backend.updates, 1);
+      backend.pendingUpdate!.complete();
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(const SizedBox.shrink());
     },
   );
 

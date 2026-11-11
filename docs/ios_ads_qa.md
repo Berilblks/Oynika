@@ -43,7 +43,7 @@ Workflow Editor iOS kurulum ve ek argüman alanını Build bölümünde sunar. [
 
 Ayarlar → Reklam tanılama (QA) ekranını aç. Reklam birimi türü test olmalı. UMP güncelleme sonucunu, ConsentStatus, PrivacyOptionsRequirementStatus, canRequestAds, Mobile Ads durumunu ve reklam yükleme sonucunu kontrol et.
 
-Test reklamını yükle düğmesi mevcut rıza ve SDK uygunluğuyla yükleme yapar. Hazır reklam zaten varsa onu korur. Test reklamını göster yalnızca resmî test birimi, hazır reklam, geçerli ekran ve SDK'nın reklam isteği izni birlikte varsa çalışır. Manuel gösterimler tamamlanan oyun sayacını artırmaz ve iki oyunluk sıklık hesabını değiştirmez.
+Test reklamını yükle düğmesi mevcut rıza ve SDK uygunluğuyla yükleme yapar. Hazır reklam zaten varsa onu korur. Test reklamını göster yalnızca resmî test birimi, hazır reklam, geçerli ekran ve SDK'nın reklam isteği izni birlikte varsa çalışır. Manuel gösterimler tamamlanan oyun sayacını artırmaz ve normal sonuç çıkışındaki reklam fırsatını tüketmez. Güncel akışta her tamamlanan oyun için sonuç ekranından çıkılırken en fazla bir interstitial fırsatı vardır; reklam hazır değilse navigasyon bekletilmez.
 
 Rıza ve SDK durumunu yeniden dene düğmesi, örneğin internet bağlantısı geri geldikten sonra yeniden değerlendirme sağlar. Denemeler arasında en az 15 saniye vardır. Uygulama yeniden ön plana geldiğinde yalnızca reklam servisi hazır değilse otomatik yeniden deneme yapılır. Bu otomatik yol oturum başına en fazla üç kez çalışır. Aynı anda yeni rıza yenilemesi başlatılmaz. SDK başlatma hatası ve zaman aşımı sonraki denemeyi kalıcı olarak engellemez.
 
