@@ -60,24 +60,36 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
     _askingExit = true;
     final leave = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Oyundan çıkılsın mı?'),
-            content: const Text('Bu oyunun skorları silinecek.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Oyunda Kal'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Çık'),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text('Oyundan çıkılsın mı?'),
+        content: const Text('Bu oyunun skorları silinecek.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Oyunda Kal'),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Çık'),
+          ),
+        ],
+      ),
     );
     _askingExit = false;
     if (leave == true && mounted) _leave();
+  }
+
+  Object _roundIdentity(CharadesState state) =>
+      state.rounds.isEmpty ? state : state.rounds.last;
+
+  void _nextRound(CharadesState state) {
+    ref
+        .read(adsServiceProvider)
+        .leaveRound(
+          _roundIdentity(state),
+          () => mounted && identical(ref.read(charadesGameProvider), state),
+          controller.nextRound,
+        );
   }
 
   void _leaveResult(CharadesState result, VoidCallback leave) {
@@ -88,6 +100,7 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
           result,
           () => mounted && identical(ref.read(charadesGameProvider), result),
           leave,
+          round: _roundIdentity(result),
         );
   }
 
@@ -103,7 +116,12 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
   Widget build(BuildContext context) {
     final state = ref.watch(charadesGameProvider);
     if (state.phase == GamePhase.result) {
-      ref.read(adsServiceProvider).recordCompletion(state);
+      ref
+          .read(adsServiceProvider)
+          .recordCompletion(state, round: _roundIdentity(state));
+    }
+    if (state.phase == GamePhase.roundResult) {
+      ref.read(adsServiceProvider).recordRound(_roundIdentity(state));
     }
     final playing = state.phase == GamePhase.playing;
     final setup = state.phase == GamePhase.setup;
@@ -158,21 +176,21 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
         ),
         bottomNavigationBar:
             setup && MediaQuery.viewInsetsOf(context).bottom == 0
-                ? Material(
-                  color: Theme.of(context).colorScheme.surface,
-                  child: SafeArea(
-                    top: false,
-                    minimum: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-                    child: Center(
-                      heightFactor: 1,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 480),
-                        child: _startAction(),
-                      ),
+            ? Material(
+                color: Theme.of(context).colorScheme.surface,
+                child: SafeArea(
+                  top: false,
+                  minimum: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                  child: Center(
+                    heightFactor: 1,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 480),
+                      child: _startAction(),
                     ),
                   ),
-                )
-                : null,
+                ),
+              )
+            : null,
         body: CustomPaint(
           painter:
               setup && Theme.of(context).brightness == Brightness.dark
@@ -184,34 +202,32 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
           child: SafeArea(
             top: false,
             child: LayoutBuilder(
-              builder:
-                  (context, constraints) => SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
-                      20,
-                      setup
-                          ? 0
-                          : playing
-                          ? 4
-                          : 12,
-                      20,
-                      setup
-                          ? 8
-                          : playing
-                          ? 12
-                          : 24,
+              builder: (context, constraints) => SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  setup
+                      ? 0
+                      : playing
+                      ? 4
+                      : 12,
+                  20,
+                  setup
+                      ? 8
+                      : playing
+                      ? 12
+                      : 24,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: 480,
+                      minHeight: (constraints.maxHeight - (playing ? 16 : 36))
+                          .clamp(0, double.infinity),
                     ),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: 480,
-                          minHeight: (constraints.maxHeight -
-                                  (playing ? 16 : 36))
-                              .clamp(0, double.infinity),
-                        ),
-                        child: content,
-                      ),
-                    ),
+                    child: content,
                   ),
+                ),
+              ),
             ),
           ),
         ),
@@ -469,7 +485,7 @@ class _CharadesScreenState extends ConsumerState<CharadesScreen>
       Column(
         children: [
           const SizedBox(height: 30),
-          TabuButton('Sonraki Takım', onPressed: controller.nextRound),
+          TabuButton('Sonraki Takım', onPressed: () => _nextRound(state)),
         ],
       ),
     ],

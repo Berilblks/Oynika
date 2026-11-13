@@ -15,6 +15,9 @@ enum AdQaField {
   load('Interstitial yükleme'),
   loadError('Son yükleme hatası'),
   completed('Tamamlanan oyun'),
+  completedRounds('Tamamlanan tur'),
+  round('Son reklam fırsatı'),
+  fullscreenAt('Son tam ekran kapanışı'),
   show('Son gösterim girişimi');
 
   const AdQaField(this.label);

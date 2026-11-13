@@ -209,29 +209,26 @@ class _WhoGameScreenState extends ConsumerState<WhoGameScreen>
     setState(() => _asking = true);
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(
-              restart
-                  ? 'Oyunu yeniden başlat?'
-                  : 'Oyundan çıkmak istiyor musun?',
-            ),
-            content: Text(
-              restart
-                  ? 'Puanlar sıfırlanacak. Oyuncular ve tur süresi korunacak.'
-                  : 'Bu oyundaki ilerlemen kaybolacak.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Vazgeç'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text(restart ? 'Yeniden Başlat' : 'Çık'),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: Text(
+          restart ? 'Oyunu yeniden başlat?' : 'Oyundan çıkmak istiyor musun?',
+        ),
+        content: Text(
+          restart
+              ? 'Puanlar sıfırlanacak. Oyuncular ve tur süresi korunacak.'
+              : 'Bu oyundaki ilerlemen kaybolacak.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Vazgeç'),
           ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(restart ? 'Yeniden Başlat' : 'Çık'),
+          ),
+        ],
+      ),
     );
     if (!mounted) return;
     setState(() => _asking = false);
@@ -314,57 +311,52 @@ class _WhoGameScreenState extends ConsumerState<WhoGameScreen>
               ),
               Expanded(
                 child: LayoutBuilder(
-                  builder:
-                      (context, box) => Center(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: SizedBox(
-                            width: box.maxWidth,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.screen_rotation_rounded,
-                                  size: 36,
-                                ),
-                                if (countdown)
-                                  Text(
-                                    '${s.countdown}',
-                                    key: const ValueKey('who-countdown'),
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.displayLarge?.copyWith(
+                  builder: (context, box) => Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: SizedBox(
+                        width: box.maxWidth,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.screen_rotation_rounded, size: 36),
+                            if (countdown)
+                              Text(
+                                '${s.countdown}',
+                                key: const ValueKey('who-countdown'),
+                                style: Theme.of(context).textTheme.displayLarge
+                                    ?.copyWith(
                                       fontSize: 76,
                                       fontWeight: FontWeight.w900,
                                     ),
-                                  ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Telefonunu yan çevir ve alnına yerleştir!',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                ),
-                                if (!countdown) ...[
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    _orientationError
-                                        ? 'Yatay görünüm hazırlanamadı. Tekrar deneyebilirsin.'
-                                        : !landscape
-                                        ? 'Yatay görünüm bekleniyor. Telefonunu yan çevir ve uygulamayı tam ekranda aç.'
-                                        : 'Hazırım ile kelime ve süre hemen başlar. Sensör oyun sırasında otomatik hazırlanır.',
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    'Öne eğ: Doğru (+1) • Arkaya eğ: Pas\nYeni kart için telefonu düz konuma getir.',
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ],
+                              ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Telefonunu yan çevir ve alnına yerleştir!',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
-                          ),
+                            if (!countdown) ...[
+                              const SizedBox(height: 12),
+                              Text(
+                                _orientationError
+                                    ? 'Yatay görünüm hazırlanamadı. Tekrar deneyebilirsin.'
+                                    : !landscape
+                                    ? 'Yatay görünüm bekleniyor. Telefonunu yan çevir ve uygulamayı tam ekranda aç.'
+                                    : 'Hazırım ile kelime ve süre hemen başlar. Sensör oyun sırasında otomatik hazırlanır.',
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Öne eğ: Doğru (+1) • Arkaya eğ: Pas\nYeni kart için telefonu düz konuma getir.',
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ],
                         ),
                       ),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
@@ -452,18 +444,27 @@ class _WhoGameScreenState extends ConsumerState<WhoGameScreen>
         ),
       );
     }
+    final roundIdentity = s.history.isEmpty ? s : s.history.last;
+    if (s.phase == WhoPhase.roundResult) {
+      ref.read(adsServiceProvider).recordRound(roundIdentity);
+    }
     if (s.phase == WhoPhase.winner) {
-      final ads = ref.read(adsServiceProvider)..recordCompletion(s);
+      final ads = ref.read(adsServiceProvider)
+        ..recordCompletion(s, round: roundIdentity);
       bool isCurrent() => mounted && identical(ref.read(whoSessionProvider), s);
       return WhoWinnerScreen(
         session: s,
-        onReplay: () => ads.leaveResult(s, isCurrent, controller.restart),
-        onGames:
-            () => ads.leaveResult(s, isCurrent, () {
-              _stopMotion();
-              controller.reset();
-              context.go('/games');
-            }),
+        onReplay: () => ads.leaveResult(
+          s,
+          isCurrent,
+          controller.restart,
+          round: roundIdentity,
+        ),
+        onGames: () => ads.leaveResult(s, isCurrent, () {
+          _stopMotion();
+          controller.reset();
+          context.go('/games');
+        }, round: roundIdentity),
       );
     }
     late Widget content, bottom;
@@ -644,7 +645,13 @@ class _WhoGameScreenState extends ConsumerState<WhoGameScreen>
         );
         bottom = _button(
           'Sıradaki Oyuncu',
-          controller.nextPlayer,
+          () => ref
+              .read(adsServiceProvider)
+              .leaveRound(
+                roundIdentity,
+                () => mounted && identical(ref.read(whoSessionProvider), s),
+                controller.nextPlayer,
+              ),
           icon: Icons.arrow_forward_rounded,
         );
     }
@@ -670,25 +677,24 @@ class _WhoGameScreenState extends ConsumerState<WhoGameScreen>
         ],
         bottom: bottom,
         body: LayoutBuilder(
-          builder:
-              (context, viewport) => SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: viewport.maxHeight),
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 20,
-                      ),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 480),
-                        child: content,
-                      ),
-                    ),
+          builder: (context, viewport) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: viewport.maxHeight),
+              child: Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 20,
+                  ),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 480),
+                    child: content,
                   ),
                 ),
               ),
+            ),
+          ),
         ),
       ),
     );

@@ -29,7 +29,9 @@ class AdsService {
     this.diagnostics,
     bool qaEnabled = false,
     this.retryCooldown = const Duration(seconds: 15),
-  }) : qaEnabled =
+    Duration Function()? clock,
+  }) : _readClock = clock,
+       qaEnabled =
            qaEnabled && isGoogleTestInterstitialUnit(_interstitialUnit) {
     diagnostics?.set(
       AdQaField.unitType,
@@ -40,6 +42,7 @@ class AdsService {
           : 'production',
     );
     diagnostics?.set(AdQaField.completed, '0');
+    diagnostics?.set(AdQaField.completedRounds, '0');
     diagnostics?.set(AdQaField.initialization, 'Başlatılmadı');
     diagnostics?.set(AdQaField.load, 'Yüklenmedi');
     diagnostics?.set(AdQaField.loadError, 'Yok');
@@ -49,6 +52,8 @@ class AdsService {
   final AdsDiagnostics? diagnostics;
   final bool qaEnabled;
   final Duration retryCooldown;
+  final Duration Function()? _readClock;
+  static const minimumFullscreenInterval = Duration(seconds: 90);
 
   final AdsBackend _backend;
   final String? _interstitialUnit;
@@ -60,10 +65,13 @@ class AdsService {
   ValueListenable<AdsStatus> get status => _status;
 
   final _completions = Expando<int>();
+  final _rounds = Expando<int>();
   final _departed = Expando<bool>();
   final _adOpportunityUsed = Expando<bool>();
   int _completed = 0;
   int get completedGames => _completed;
+  int _completedRounds = 0;
+  int get completedRounds => _completedRounds;
   int _generation = 0;
   bool _disposed = false;
   bool _loading = false;
@@ -72,6 +80,13 @@ class AdsService {
   Future<void>? _initialization;
   InterstitialPlacement? _interstitial;
   final _clock = Stopwatch()..start();
+  Duration get _now => _readClock?.call() ?? _clock.elapsed;
+  Duration? _lastFullscreenAt;
+  Duration? get lastFullscreenAt => _lastFullscreenAt;
+  Timer? _cooldownTimer;
+  bool get _intervalReady =>
+      _lastFullscreenAt == null ||
+      _now - _lastFullscreenAt! >= minimumFullscreenInterval;
   Duration? _loadedAt;
   Duration? _lastConsentAttempt;
   int _automaticRetries = 0;
@@ -79,7 +94,10 @@ class AdsService {
   bool get qaCanLoad =>
       qaEnabled && !_disposed && !_status.value.busy && !_loading && !_showing;
   bool get qaCanShow =>
-      qaCanLoad && _status.value.ready && _interstitial != null;
+      qaCanLoad &&
+      _status.value.ready &&
+      _interstitial != null &&
+      _intervalReady;
 
   /// Explicit requests are rate limited. Resume retries are capped per session.
   Future<bool> retryConsent({bool automatic = false}) async {
@@ -88,7 +106,7 @@ class AdsService {
         _showing ||
         (automatic && (_status.value.ready || _automaticRetries >= 3)) ||
         (_lastConsentAttempt != null &&
-            _clock.elapsed - _lastConsentAttempt! < retryCooldown)) {
+            _now - _lastConsentAttempt! < retryCooldown)) {
       return false;
     }
     if (automatic) _automaticRetries++;
@@ -160,7 +178,7 @@ class AdsService {
 
   Future<bool> _refreshConsent({bool privacy = false}) async {
     if (_interstitialUnit == null || _disposed) return false;
-    _lastConsentAttempt = _clock.elapsed;
+    _lastConsentAttempt = _now;
     final generation = ++_generation;
     var privacyOptions = _status.value.privacyOptions;
     _interstitial?.dispose();
@@ -244,7 +262,7 @@ class AdsService {
       final ad = await _backend.loadInterstitial(_interstitialUnit!);
       if (_valid(generation)) {
         _interstitial = ad;
-        _loadedAt = _clock.elapsed;
+        _loadedAt = _now;
         diagnostics?.set(AdQaField.load, ad == null ? 'Yüklenemedi' : 'Hazır');
       } else {
         ad?.dispose();
@@ -261,18 +279,25 @@ class AdsService {
     }
   }
 
-  void recordCompletion(Object result) {
+  void recordCompletion(Object result, {Object? round}) {
     if (_disposed || _completions[result] != null) return;
     _completions[result] = ++_completed;
     diagnostics?.set(AdQaField.completed, '$_completed');
+    recordRound(round ?? result);
+  }
+
+  /// The immutable saved turn result is shared by round and winner screens.
+  void recordRound(Object round) {
+    if (_disposed || _rounds[round] != null) return;
+    _rounds[round] = ++_completedRounds;
+    diagnostics?.set(AdQaField.completedRounds, '$_completedRounds');
     _discardExpired();
     unawaited(_preload());
   }
 
   void _discardExpired() {
     final loadedAt = _loadedAt;
-    if (loadedAt != null &&
-        _clock.elapsed - loadedAt >= const Duration(minutes: 55)) {
+    if (loadedAt != null && _now - loadedAt >= const Duration(minutes: 55)) {
       _interstitial?.dispose();
       _interstitial = null;
       _loadedAt = null;
@@ -283,37 +308,53 @@ class AdsService {
   void leaveResult(
     Object result,
     bool Function() isCurrent,
-    FutureOr<void> Function() leave,
-  ) {
-    if (_disposed || _showing || _departed[result] == true || !isCurrent()) {
+    FutureOr<void> Function() leave, {
+    Object? round,
+  }) {
+    if (_disposed || _showing || !isCurrent()) return;
+    recordCompletion(result, round: round);
+    leaveRound(round ?? result, isCurrent, leave, transition: result);
+  }
+
+  void leaveRound(
+    Object result,
+    bool Function() isCurrent,
+    FutureOr<void> Function() leave, {
+    Object? transition,
+  }) {
+    final departure = transition ?? result;
+    if (_disposed || _showing || _departed[departure] == true || !isCurrent()) {
       return;
     }
-    recordCompletion(result);
+    recordRound(result);
     _discardExpired();
-    _departed[result] = true;
+    _departed[departure] = true;
     void continueExit() {
       final action = leave();
       if (action is Future<void>) {
         unawaited(
           action.whenComplete(() {
             // A native replay prerequisite can fail and leave the result visible.
-            if (!_disposed && isCurrent()) _departed[result] = null;
+            if (!_disposed && isCurrent()) _departed[departure] = null;
           }),
         );
       }
     }
 
-    final count = _completions[result];
+    final count = _rounds[result];
+    diagnostics?.set(AdQaField.round, 'Tur #$count');
     final ad = _interstitial;
     final eligible = count != null && _adOpportunityUsed[result] != true;
     _adOpportunityUsed[result] = true;
-    if (!_status.value.ready || !eligible || ad == null) {
+    if (!_status.value.ready || !eligible || ad == null || !_intervalReady) {
       diagnostics?.set(
         AdQaField.show,
         !eligible
             ? 'Bu sonuç için reklam fırsatı yok'
             : !_status.value.ready
             ? 'UMP veya SDK hazır değil'
+            : !_intervalReady
+            ? '90 saniyelik reklam aralığı dolmadı'
             : 'Hazır reklam yok',
       );
       continueExit();
@@ -329,10 +370,12 @@ class AdsService {
     bool Function() isCurrent,
     VoidCallback leave,
   ) async {
+    var attempted = false;
     diagnostics?.set(AdQaField.show, 'Gösterim istendi');
     diagnostics?.set(AdQaField.load, 'Hazır reklam tüketildi');
     try {
-      if (!await _backend.canRequestAds() ||
+      if (!_intervalReady ||
+          !await _backend.canRequestAds() ||
           _disposed ||
           !_status.value.ready ||
           !isCurrent()) {
@@ -342,12 +385,30 @@ class AdsService {
         );
         return;
       }
+      attempted = true;
+      _lastFullscreenAt = _now;
       await ad.show();
       diagnostics?.set(AdQaField.show, 'Gösterim tamamlandı');
     } catch (_) {
       diagnostics?.set(AdQaField.show, 'Gösterim tamamlanamadı');
       // Continue the same exit after a failed presentation.
     } finally {
+      if (attempted) {
+        // Count from dismissal/failure, which is stricter than start-to-start.
+        _lastFullscreenAt = _now;
+        diagnostics?.set(
+          AdQaField.fullscreenAt,
+          '${_now.inSeconds}. saniye (oturum)',
+        );
+        _cooldownTimer?.cancel();
+        if (diagnostics != null && !_disposed) {
+          _cooldownTimer = Timer(minimumFullscreenInterval, () {
+            if (!_disposed) {
+              diagnostics?.event('90 saniyelik reklam aralığı doldu');
+            }
+          });
+        }
+      }
       ad.dispose();
       _showing = false;
       diagnostics?.event('Gösterim akışı sona erdi');
@@ -358,6 +419,8 @@ class AdsService {
 
   void dispose() {
     _disposed = true;
+    _cooldownTimer?.cancel();
+    _clock.stop();
     _interstitial?.dispose();
     _interstitial = null;
     _status.dispose();

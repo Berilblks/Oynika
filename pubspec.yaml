@@ -1,7 +1,7 @@
 name: oynika
 description: "Arkadaş ortamları için çevrimdışı parti oyunları uygulaması."
 publish_to: 'none'
-version: 0.1.0+3
+version: 0.1.0+4
 
 environment:
   sdk: ^3.10.0

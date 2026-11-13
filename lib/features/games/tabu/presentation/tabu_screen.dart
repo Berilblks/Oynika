@@ -55,21 +55,20 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
     _askingExit = true;
     final leave = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Oyundan çıkılsın mı?'),
-            content: const Text('Bu oyunun skorları silinecek.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Oyunda Kal'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Çık'),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text('Oyundan çıkılsın mı?'),
+        content: const Text('Bu oyunun skorları silinecek.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Oyunda Kal'),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Çık'),
+          ),
+        ],
+      ),
     );
     _askingExit = false;
     if (leave == true && mounted) {
@@ -81,6 +80,19 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
     }
   }
 
+  Object _roundIdentity(GameState state) =>
+      state.rounds.isEmpty ? state : state.rounds.last;
+
+  void _nextRound(GameState state) {
+    ref
+        .read(adsServiceProvider)
+        .leaveRound(
+          _roundIdentity(state),
+          () => mounted && identical(ref.read(tabuGameProvider), state),
+          controller.nextRound,
+        );
+  }
+
   void _leaveResult(GameState result, VoidCallback leave) {
     if (!mounted) return;
     ref
@@ -89,6 +101,7 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
           result,
           () => mounted && identical(ref.read(tabuGameProvider), result),
           leave,
+          round: _roundIdentity(result),
         );
   }
 
@@ -104,7 +117,12 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
   Widget build(BuildContext context) {
     final state = ref.watch(tabuGameProvider);
     if (state.phase == GamePhase.result) {
-      ref.read(adsServiceProvider).recordCompletion(state);
+      ref
+          .read(adsServiceProvider)
+          .recordCompletion(state, round: _roundIdentity(state));
+    }
+    if (state.phase == GamePhase.roundResult) {
+      ref.read(adsServiceProvider).recordRound(_roundIdentity(state));
     }
     final playing = state.phase == GamePhase.playing;
     final setup = state.phase == GamePhase.setup;
@@ -158,21 +176,21 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
         ),
         bottomNavigationBar:
             setup && MediaQuery.viewInsetsOf(context).bottom == 0
-                ? Material(
-                  color: Theme.of(context).colorScheme.surface,
-                  child: SafeArea(
-                    top: false,
-                    minimum: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-                    child: Center(
-                      heightFactor: 1,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 480),
-                        child: _startAction(),
-                      ),
+            ? Material(
+                color: Theme.of(context).colorScheme.surface,
+                child: SafeArea(
+                  top: false,
+                  minimum: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                  child: Center(
+                    heightFactor: 1,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 480),
+                      child: _startAction(),
                     ),
                   ),
-                )
-                : null,
+                ),
+              )
+            : null,
         body: CustomPaint(
           painter:
               setup && Theme.of(context).brightness == Brightness.dark
@@ -184,34 +202,32 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
           child: SafeArea(
             top: false,
             child: LayoutBuilder(
-              builder:
-                  (context, constraints) => SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
-                      20,
-                      setup
-                          ? 0
-                          : playing
-                          ? 4
-                          : 12,
-                      20,
-                      setup
-                          ? 8
-                          : playing
-                          ? 12
-                          : 24,
+              builder: (context, constraints) => SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  setup
+                      ? 0
+                      : playing
+                      ? 4
+                      : 12,
+                  20,
+                  setup
+                      ? 8
+                      : playing
+                      ? 12
+                      : 24,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: 480,
+                      minHeight: (constraints.maxHeight - (playing ? 16 : 36))
+                          .clamp(0, double.infinity),
                     ),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: 480,
-                          minHeight: (constraints.maxHeight -
-                                  (playing ? 16 : 36))
-                              .clamp(0, double.infinity),
-                        ),
-                        child: content,
-                      ),
-                    ),
+                    child: content,
                   ),
+                ),
+              ),
             ),
           ),
         ),
@@ -237,33 +253,31 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
   Widget _startAction() => ref
       .watch(tabuCardsProvider)
       .when(
-        data:
-            (deck) => TabuStartButton(
-              onPressed: () {
-                if (!_form.currentState!.validate()) return;
-                FocusScope.of(context).unfocus();
-                controller.configure(
-                  GameSession(
-                    names: [_blue.text, _red.text],
-                    seconds: _seconds,
-                    targetScore: _targetScore,
-                  ),
-                  deck,
-                );
-              },
-            ),
+        data: (deck) => TabuStartButton(
+          onPressed: () {
+            if (!_form.currentState!.validate()) return;
+            FocusScope.of(context).unfocus();
+            controller.configure(
+              GameSession(
+                names: [_blue.text, _red.text],
+                seconds: _seconds,
+                targetScore: _targetScore,
+              ),
+              deck,
+            );
+          },
+        ),
         loading: () => const TabuStartButton(onPressed: null),
-        error:
-            (error, stack) => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Kartlar yüklenemedi. Lütfen tekrar dene.'),
-                TextButton(
-                  onPressed: () => ref.invalidate(tabuCardsProvider),
-                  child: const Text('Yeniden Dene'),
-                ),
-              ],
+        error: (error, stack) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Kartlar yüklenemedi. Lütfen tekrar dene.'),
+            TextButton(
+              onPressed: () => ref.invalidate(tabuCardsProvider),
+              child: const Text('Yeniden Dene'),
             ),
+          ],
+        ),
       );
 
   List<Color> get _scoreColors =>
@@ -476,7 +490,7 @@ class _TabuScreenState extends ConsumerState<TabuScreen>
       Column(
         children: [
           const SizedBox(height: 30),
-          TabuButton('Sonraki Takım', onPressed: controller.nextRound),
+          TabuButton('Sonraki Takım', onPressed: () => _nextRound(state)),
         ],
       ),
     ],

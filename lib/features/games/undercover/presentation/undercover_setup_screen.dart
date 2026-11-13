@@ -37,6 +37,7 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
   static const _privacyChannel = MethodChannel('oynika/undercover_privacy');
   bool _starting = false;
   UndercoverSession? _viewingResults;
+  Object _resultsEntry = Object();
   bool _secure = false;
   Future<void> _privacyRelease = Future.value();
 
@@ -107,6 +108,7 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
       }
       if (launch()) {
         _viewingResults = null;
+        _resultsEntry = Object();
       } else {
         await _releasePrivacy();
       }
@@ -143,45 +145,42 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
       constraints: BoxConstraints(
         maxHeight: MediaQuery.sizeOf(context).height * .9,
       ),
-      builder:
-          (context) => SafeArea(
-            top: false,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Aramızdaki Casus Nasıl Oynanır?',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 20),
-                  for (final (index, rule)
-                      in PartyGame.undercover.instructions.indexed)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _numberBadge(context, index),
-                          const SizedBox(width: 12),
-                          Expanded(child: Text(rule)),
-                        ],
-                      ),
-                    ),
-                  FilledButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(0, 56),
-                    ),
-                    child: const Text('Anladım'),
-                  ),
-                ],
+      builder: (context) => SafeArea(
+        top: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Aramızdaki Casus Nasıl Oynanır?',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-            ),
+              const SizedBox(height: 20),
+              for (final (index, rule)
+                  in PartyGame.undercover.instructions.indexed)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _numberBadge(context, index),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(rule)),
+                    ],
+                  ),
+                ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context),
+                style: FilledButton.styleFrom(minimumSize: const Size(0, 56)),
+                child: const Text('Anladım'),
+              ),
+            ],
           ),
+        ),
+      ),
     );
   }
 
@@ -268,7 +267,14 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
       final controller = ref.read(undercoverSessionProvider.notifier);
       final finished = session.phase == UndercoverPhase.finished;
       final ads = ref.read(adsServiceProvider);
-      if (finished) ads.recordCompletion(session);
+      final round = session.round;
+      if (finished) ads.recordCompletion(session, round: round);
+      if (round != null &&
+          (round.phase == UndercoverPhase.elimination ||
+              (round.phase == UndercoverPhase.tie &&
+                  round.runoffCandidates.isNotEmpty))) {
+        ads.recordRound(round);
+      }
       bool isCurrent() =>
           mounted && identical(ref.read(undercoverSessionProvider), session);
       if (identical(_viewingResults, session) &&
@@ -276,24 +282,23 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
         return UndercoverResultsScreen(
           session: session,
           busy: _starting,
-          onBack: () => setState(() => _viewingResults = null),
-          onReplay:
-              () => ads.leaveResult(
-                session,
-                isCurrent,
-                () => _launchGame(
-                  () => controller.restartWithSamePlayers(session),
-                ),
-              ),
-          onHome:
-              () => ads.leaveResult(session, isCurrent, () {
-                _viewingResults = null;
-                controller.exit();
-                context.go('/');
-              }),
+          onBack: () => setState(() {
+            _viewingResults = null;
+            _resultsEntry = Object();
+          }),
+          onReplay: () => ads.leaveResult(
+            session,
+            isCurrent,
+            () => _launchGame(() => controller.restartWithSamePlayers(session)),
+            round: round,
+          ),
+          onHome: () => ads.leaveResult(session, isCurrent, () {
+            _viewingResults = null;
+            controller.exit();
+            context.go('/');
+          }, round: round),
         );
       }
-      final round = session.round;
       if (round != null) {
         return UndercoverRoundScreen(
           key: ValueKey(round),
@@ -305,22 +310,46 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
                   ? null
                   : session.players[round.eliminatedId!].role,
           onBeginVoting: () => controller.beginVoting(round),
-          onVote:
-              (candidate) => controller.vote(round, round.voter!, candidate),
-          onTie: () => controller.continueTie(round),
-          onElimination: () => controller.continueElimination(round),
+          onVote: (candidate) =>
+              controller.vote(round, round.voter!, candidate),
+          onTie: () {
+            if (round.runoffCandidates.isNotEmpty) {
+              ads.leaveRound(
+                round,
+                isCurrent,
+                () => controller.continueTie(round),
+              );
+            } else {
+              controller.continueTie(round);
+            }
+          },
+          onElimination: () => ads.leaveRound(
+            round,
+            isCurrent,
+            () => controller.continueElimination(round),
+          ),
           onResults: () {
             if (identical(ref.read(undercoverSessionProvider), session) &&
-                session.phase == UndercoverPhase.finished) {
-              setState(() => _viewingResults = session);
+                session.phase == UndercoverPhase.finished &&
+                !identical(_viewingResults, session)) {
+              ads.leaveRound(
+                round,
+                isCurrent,
+                () => setState(() => _viewingResults = session),
+                transition: _resultsEntry,
+              );
             }
           },
           enablePrivacy: _enablePrivacy,
           releasePrivacy: _releasePrivacy,
-          onExit:
-              finished
-                  ? () => ads.leaveResult(session, isCurrent, controller.exit)
-                  : controller.exit,
+          onExit: finished
+              ? () => ads.leaveResult(
+                  session,
+                  isCurrent,
+                  controller.exit,
+                  round: round,
+                )
+              : controller.exit,
         );
       }
       return UndercoverDistributionScreen(
@@ -359,27 +388,26 @@ class _UndercoverSetupScreenState extends ConsumerState<UndercoverSetupScreen> {
           ),
         ],
       ),
-      bottomNavigationBar:
-          keyboardOpen
-              ? null
-              : Material(
-                color: Colors.transparent,
-                child: SafeArea(
-                  top: false,
-                  minimum: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-                  child: Center(
-                    heightFactor: 1,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 480),
-                      child: UndercoverButton(
-                        label: 'Oyunu Başlat',
-                        icon: Icons.play_arrow_rounded,
-                        onPressed: _starting ? null : _start,
-                      ),
+      bottomNavigationBar: keyboardOpen
+          ? null
+          : Material(
+              color: Colors.transparent,
+              child: SafeArea(
+                top: false,
+                minimum: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                child: Center(
+                  heightFactor: 1,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 480),
+                    child: UndercoverButton(
+                      label: 'Oyunu Başlat',
+                      icon: Icons.play_arrow_rounded,
+                      onPressed: _starting ? null : _start,
                     ),
                   ),
                 ),
               ),
+            ),
       body: SafeArea(
         top: false,
         child: SingleChildScrollView(

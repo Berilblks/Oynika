@@ -84,6 +84,7 @@ AdsService _service(
   bool qa = false,
   AdsDiagnostics? diagnostics,
   Duration retryCooldown = const Duration(seconds: 15),
+  Duration Function()? clock,
 }) {
   final service = AdsService(
     backend,
@@ -91,6 +92,7 @@ AdsService _service(
     qaEnabled: qa,
     diagnostics: diagnostics,
     retryCooldown: retryCooldown,
+    clock: clock,
   );
   addTearDown(service.dispose);
   return service;
@@ -121,8 +123,8 @@ void main() {
       final ad = _Interstitial();
       final nextAd = _Interstitial();
       final backend = _Backend()..interstitial = ad;
-      final ads = _service(backend);
       var now = Duration.zero;
+      final ads = _service(backend, clock: () => now);
       final container = ProviderContainer(
         overrides: [
           adsServiceProvider.overrideWithValue(ads),
@@ -179,6 +181,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(container.read(tabuGameProvider).phase, GamePhase.preRound);
 
+      now += const Duration(seconds: 90);
       router.go('/games/charades');
       await tester.pumpAndSettle();
       final charades = container.read(charadesGameProvider.notifier);
@@ -326,7 +329,8 @@ void main() {
     () async {
       var ad = _Interstitial();
       final backend = _Backend()..interstitial = ad;
-      final ads = _service(backend);
+      var now = Duration.zero;
+      final ads = _service(backend, clock: () => now);
       await ads.start();
       await _flush();
       var exits = 0;
@@ -356,6 +360,7 @@ void main() {
         ads.leaveResult(result, () => true, () => exits++);
         expect(exits, i + 1);
         ad = next;
+        now += const Duration(seconds: 90);
       }
       expect(ads.completedGames, 4);
     },
@@ -697,11 +702,19 @@ void main() {
       );
       if (qa) {
         await tester.scrollUntilVisible(find.text('Test reklamını yükle'), 200);
+        await tester.pumpAndSettle();
       }
       expect(
         find.text('Test reklamını yükle'),
         qa ? findsOneWidget : findsNothing,
       );
+      if (qa) {
+        await tester.scrollUntilVisible(
+          find.text('Test reklamını göster'),
+          200,
+        );
+        await tester.pumpAndSettle();
+      }
       expect(
         find.text('Test reklamını göster'),
         qa ? findsOneWidget : findsNothing,
