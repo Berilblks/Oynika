@@ -58,6 +58,9 @@ class GoogleAdsBackend implements AdsBackend {
   final AdsDiagnostics? diagnostics;
   final List<String> testDevices;
 
+  @visibleForTesting
+  bool get isIOS => Platform.isIOS;
+
   @override
   Future<void> updateConsent() {
     const forceEea = kDebugMode && bool.fromEnvironment('OYNIKA_UMP_DEBUG_EEA');
@@ -143,6 +146,17 @@ class GoogleAdsBackend implements AdsBackend {
 
   @override
   Future<void> initialize() async {
+    if (isIOS) {
+      try {
+        await MobileAds.instance.setSameAppKeyEnabled(false);
+      } catch (_) {
+        _logAdQa('Publisher first-party ID configuration failed');
+        diagnostics?.event('iOS reklam gizlilik yapılandırması tamamlanamadı');
+        // Do not initialize or request ads with an unconfirmed privacy setting.
+        // AdsService catches this failure and permits a later controlled retry.
+        rethrow;
+      }
+    }
     if (testDevices.isNotEmpty) {
       await MobileAds.instance.updateRequestConfiguration(
         RequestConfiguration(testDeviceIds: testDevices),
